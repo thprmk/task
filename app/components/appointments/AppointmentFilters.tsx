@@ -1,0 +1,191 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { AppointmentFilters as Filters, AppointmentStatus } from '../../../lib/types/appointment.types';
+import { Department } from '../../../lib/types/doctor.types';
+import { Doctor } from '../../../lib/types/doctor.types';
+import { Card, Select } from '../ui';
+import Input from '../ui/Input';
+import Button from '../ui/Button';
+
+interface AppointmentFiltersProps {
+  filters: Filters;
+  onFiltersChange: (filters: Partial<Filters>) => void;
+  onReset: () => void;
+}
+
+export default function AppointmentFilters({
+  filters,
+  onFiltersChange,
+  onReset,
+}: AppointmentFiltersProps) {
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  useEffect(() => {
+    if (filters.departmentId) {
+      fetchDoctors(filters.departmentId);
+    } else {
+      setDoctors([]);
+    }
+  }, [filters.departmentId]);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch('/api/departments');
+      const data = await response.json();
+      if (data.success) {
+        setDepartments(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDoctors = async (departmentId: string) => {
+    try {
+      const response = await fetch(`/api/doctors?departmentId=${departmentId}`);
+      const data = await response.json();
+      if (data.success) {
+        setDoctors(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+    }
+  };
+
+  const statusOptions = [
+    { value: AppointmentStatus.PENDING, label: 'Pending' },
+    { value: AppointmentStatus.CONFIRMED, label: 'Confirmed' },
+    { value: AppointmentStatus.COMPLETED, label: 'Completed' },
+    { value: AppointmentStatus.CANCELLED, label: 'Cancelled' },
+    { value: AppointmentStatus.NO_SHOW, label: 'No Show' },
+  ];
+
+  const departmentOptions = [
+    { value: '', label: 'All Departments' },
+    ...departments.map((dept) => ({
+      value: dept._id || '',
+      label: dept.name,
+    })),
+  ];
+
+  const doctorOptions = [
+    { value: '', label: 'All Doctors' },
+    ...doctors.map((doctor) => ({
+      value: doctor._id || '',
+      label: `${doctor.name} - ${doctor.specialization}`,
+    })),
+  ];
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedStatuses = Array.from(e.target.selectedOptions, (option) => option.value);
+    onFiltersChange({
+      status: selectedStatuses.length > 0 ? (selectedStatuses as AppointmentStatus[]) : undefined,
+    });
+  };
+
+  return (
+    <Card title="Filters" className="mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Department Filter */}
+        <Select
+          label="Department"
+          options={departmentOptions}
+          value={filters.departmentId || ''}
+          onChange={(e) =>
+            onFiltersChange({
+              departmentId: e.target.value || undefined,
+              doctorId: undefined, // Reset doctor when department changes
+            })
+          }
+          disabled={loading}
+        />
+
+        {/* Doctor Filter */}
+        <Select
+          label="Doctor"
+          options={doctorOptions}
+          value={filters.doctorId || ''}
+          onChange={(e) =>
+            onFiltersChange({
+              doctorId: e.target.value || undefined,
+            })
+          }
+          disabled={loading || !filters.departmentId}
+        />
+
+        {/* Date From */}
+        <Input
+          type="date"
+          label="Date From"
+          value={
+            filters.dateFrom
+              ? new Date(filters.dateFrom).toISOString().split('T')[0]
+              : ''
+          }
+          onChange={(e) =>
+            onFiltersChange({
+              dateFrom: e.target.value ? new Date(e.target.value) : undefined,
+            })
+          }
+        />
+
+        {/* Date To */}
+        <Input
+          type="date"
+          label="Date To"
+          value={
+            filters.dateTo
+              ? new Date(filters.dateTo).toISOString().split('T')[0]
+              : ''
+          }
+          onChange={(e) =>
+            onFiltersChange({
+              dateTo: e.target.value ? new Date(e.target.value) : undefined,
+            })
+          }
+        />
+      </div>
+
+      {/* Status Filter */}
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Status (Multiple Selection)
+        </label>
+        <select
+          multiple
+          value={filters.status || []}
+          onChange={handleStatusChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          size={5}
+        >
+          {statusOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-gray-500 mt-1">
+          Hold Ctrl/Cmd to select multiple statuses
+        </p>
+      </div>
+
+      {/* Reset Button */}
+      <div className="mt-4 flex justify-end">
+        <Button variant="outline" onClick={onReset}>
+          Reset Filters
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
+
