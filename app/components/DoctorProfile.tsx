@@ -74,7 +74,7 @@ export default function DoctorProfile() {
                         lineHeight: '37px',
                     }}
                 >
-                    Dr. Raghul
+                    Dr. Raghull
                 </h1>
                 <p
                     className="text-black mb-3"
