@@ -11,19 +11,21 @@ interface AppointmentCardProps {
   onStatusUpdate?: (id: string, status: string) => void;
 }
 
+type PopulatedRef = { name?: string; _id?: { toString(): string }; id?: { toString(): string } };
+
 export default function AppointmentCard({ appointment, onStatusUpdate }: AppointmentCardProps) {
-  const doctorName = typeof appointment.doctorId === 'object' && appointment.doctorId
-    ? appointment.doctorId.name
+  const doctorRef = appointment.doctorId as PopulatedRef | string;
+  const departmentRef = appointment.departmentId as PopulatedRef | string;
+  const doctorName = typeof doctorRef === 'object' && doctorRef && 'name' in doctorRef
+    ? doctorRef.name
     : 'Unknown Doctor';
-  
-  const departmentName = typeof appointment.departmentId === 'object' && appointment.departmentId
-    ? appointment.departmentId.name
+  const departmentName = typeof departmentRef === 'object' && departmentRef && 'name' in departmentRef
+    ? departmentRef.name
     : 'Unknown Department';
 
-  // Get doctor ID as string for the link
-  const doctorIdString = typeof appointment.doctorId === 'object' && appointment.doctorId
-    ? (appointment.doctorId._id?.toString() || appointment.doctorId.id?.toString() || '')
-    : (appointment.doctorId?.toString() || '');
+  const doctorIdString = typeof doctorRef === 'object' && doctorRef
+    ? (doctorRef._id?.toString() || doctorRef.id?.toString() || '')
+    : (typeof doctorRef === 'string' ? doctorRef : '');
 
   return (
     <Card className="hover:shadow-lg transition-shadow">

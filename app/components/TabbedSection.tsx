@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 interface Tab {
   id: string;
@@ -19,9 +18,7 @@ const tabsData: Tab[] = [
     content: {
       title: 'Brief Summary',
       paragraphs: [
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-        'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-        'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in',
       ],
     },
   },
@@ -31,9 +28,7 @@ const tabsData: Tab[] = [
     content: {
       title: 'Areas of Expertise',
       paragraphs: [
-        'Our hospital specializes in a wide range of medical disciplines including cardiology, neurology, oncology, orthopedics, and pediatrics. Our team of experienced specialists provides comprehensive care across all these areas.',
-        'We are committed to staying at the forefront of medical innovation, continuously updating our practices and technologies to provide the best possible care for our patients.',
-        'Each department is staffed with board-certified physicians and supported by state-of-the-art medical equipment and facilities.',
+        'Our hospital specializes in a wide range of medical disciplines including cardiology, neurology, oncology, orthopedics, and pediatrics.',
       ],
     },
   },
@@ -43,9 +38,7 @@ const tabsData: Tab[] = [
     content: {
       title: 'Professional Qualifications',
       paragraphs: [
-        'All our medical professionals hold advanced degrees from accredited institutions and maintain active board certifications in their respective specialties.',
-        'Our team regularly participates in continuing medical education programs and professional development to ensure they stay current with the latest medical advances and best practices.',
-        'We are accredited by major healthcare organizations and maintain the highest standards of medical care and patient safety.',
+        'All our medical professionals hold advanced degrees from accredited institutions and maintain active board certifications.',
       ],
     },
   },
@@ -55,132 +48,122 @@ const tabsData: Tab[] = [
     content: {
       title: 'Professional Memberships',
       paragraphs: [
-        'Our hospital and medical staff are members of prestigious professional organizations including the American Medical Association, American Hospital Association, and various specialty-specific medical societies.',
-        'These memberships ensure we maintain the highest standards of care and have access to the latest research, best practices, and professional networks.',
-        'We actively participate in medical conferences, research collaborations, and professional development programs through these memberships.',
+        'Our hospital and medical staff are members of prestigious professional organizations including the American Medical Association.',
       ],
     },
   },
 ];
 
+const TAB_FONT = {
+  fontFamily: "'Helonik', sans-serif",
+  fontWeight: 500,
+  fontSize: 18.7573,
+  lineHeight: '66px',
+} as const;
+
 export default function TabbedSection() {
   const [activeTab, setActiveTab] = useState<string>('overview');
-  const [activeTabPosition, setActiveTabPosition] = useState({ left: 0, width: 0 });
-  const tabsContainerRef = useRef<HTMLDivElement>(null);
-
   const currentTab = tabsData.find((tab) => tab.id === activeTab) || tabsData[0];
 
-  useEffect(() => {
-    const updateActiveTabPosition = () => {
-      const activeButton = document.querySelector(`[data-tab-id="${activeTab}"]`) as HTMLElement;
-      const container = tabsContainerRef.current;
-      
-      if (activeButton && container) {
-        const buttonRect = activeButton.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        
-        setActiveTabPosition({
-          left: buttonRect.left - containerRect.left,
-          width: buttonRect.width,
-        });
-      }
-    };
-
-    setTimeout(updateActiveTabPosition, 0);
-    window.addEventListener('resize', updateActiveTabPosition);
-    return () => window.removeEventListener('resize', updateActiveTabPosition);
-  }, [activeTab]);
-
   return (
-    <div className="bg-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Outer wrapper with continuous border around everything */}
+    <section className="bg-white py-12 px-4 flex justify-center">
+      {/* Group 1000002333: width 1103.48px, centered, min-height 463.84px */}
+      <div
+        className="relative flex flex-col w-full"
+        style={{
+          maxWidth: 1103.48,
+          minHeight: 463.84,
+        }}
+      >
+        {/* Vector 3: vertical bar - left 88px, #FAFAFA, border #F05137, radius 23.4466px */}
         <div
-          className="border-2 rounded-xl relative overflow-hidden"
-          style={{ borderColor: '#F05137' }}
-        >
-          {/* Tabs Navigation */}
-          <div className="relative px-6 sm:px-8 pt-6 sm:pt-8 pb-0" ref={tabsContainerRef}>
-            <div className="flex flex-wrap gap-0">
-              {tabsData.map((tab) => {
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    data-tab-id={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`
-                      px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-normal transition-all relative z-10
-                      ${
-                        isActive
-                          ? 'text-[#F05137]'
-                          : 'text-black hover:text-gray-600'
-                      }
-                    `}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          className="absolute top-0 bottom-0 hidden sm:block"
+          style={{
+            left: 88,
+            width: 10,
+            top: 0,
+            height: '100%',
+            minHeight: 463.84,
+            background: '#FAFAFA',
+            border: '2.34466px solid #F05137',
+            borderRadius: 23.4466,
+          }}
+          aria-hidden
+        />
 
-          {/* Content Area - border connects seamlessly to active tab */}
-          <div className="px-6 sm:px-8 pb-6 sm:pb-8 relative">
-            {/* Active tab border connection - creates folder tab effect */}
-            <motion.div
-              className="absolute top-0"
-              style={{ 
-                left: `${activeTabPosition.left}px`,
-                width: `${activeTabPosition.width}px`,
-                height: '2px',
-                backgroundColor: '#F05137',
-                borderTopLeftRadius: '12px',
-                borderTopRightRadius: '12px',
-                zIndex: 20,
-              }}
-              initial={false}
-              animate={{
-                left: `${activeTabPosition.left}px`,
-                width: `${activeTabPosition.width}px`,
-              }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            />
-            
-            <div
-              className="border-2 rounded-b-xl p-6 sm:p-8 lg:p-10 bg-white relative"
-              style={{ 
-                borderColor: '#F05137',
-                borderTop: 'none',
-                marginTop: '-2px',
-              }}
-            >
-              {/* Content */}
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="relative z-10"
+        {/* Frame 110: Tabs row - gap 120px, left 430.39 */}
+        <div
+          className="flex flex-row items-center flex-wrap gap-8 sm:gap-[120px] z-10 mb-0 pl-4 sm:pl-0 sm:ml-[430px]"
+          style={{
+            minHeight: 67,
+          }}
+        >
+          {tabsData.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className="transition-colors hover:opacity-80"
+                style={{
+                  ...TAB_FONT,
+                  color: isActive ? '#F05137' : '#000000',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
               >
-                <h2 className="text-2xl sm:text-3xl font-bold text-black mb-6 sm:mb-8">
-                  {currentTab.content.title}
-                </h2>
-                <div className="space-y-4 sm:space-y-5">
-                  {currentTab.content.paragraphs.map((paragraph, index) => (
-                    <p
-                      key={index}
-                      className="text-base sm:text-lg text-black leading-relaxed"
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Content box: title at 134px, body at 134px - same left padding */}
+        <div
+          className="relative z-10 border border-[#F05137] bg-[#FAFAFA] flex-1 min-h-[380px] pl-6 sm:pl-[134px]"
+          style={{
+            borderWidth: 2.34466,
+            borderRadius: 23.4466,
+            marginTop: -2.34,
+            paddingRight: 52,
+            paddingTop: 24,
+            paddingBottom: 40,
+          }}
+        >
+          {/* Brief Summary - Helonik 500 31.2622px, line-height 57px */}
+          <h2
+            className="text-black mb-6"
+            style={{
+              fontFamily: "'Helonik', sans-serif",
+              fontWeight: 500,
+              fontSize: 31.2622,
+              lineHeight: '57px',
+            }}
+          >
+            {currentTab.content.title}
+          </h2>
+          {/* Body - Helonik 400 12.5049px, line-height 25px, max-width 1017px */}
+          <div className="max-w-[1017px]">
+            {currentTab.content.paragraphs.map((paragraph, index) => (
+              <p
+                key={index}
+                className="text-black mb-4 last:mb-0"
+                style={{
+                  fontFamily: "'Helonik', sans-serif",
+                  fontWeight: 400,
+                  fontSize: 12.5049,
+                  lineHeight: '25px',
+                }}
+              >
+                {paragraph}
+              </p>
+            ))}
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -15,20 +15,22 @@ import { join } from 'path';
 import Department from '../models/Department';
 import Doctor from '../models/Doctor';
 
-// Load .env.local file if it exists
+// Load .env.local file if it exists (so "npm run seed" picks up MONGODB_URI)
 try {
   const envPath = join(process.cwd(), '.env.local');
   const envFile = readFileSync(envPath, 'utf-8');
-  envFile.split('\n').forEach((line) => {
-    const [key, ...valueParts] = line.split('=');
-    if (key && valueParts.length > 0) {
-      const value = valueParts.join('=').trim().replace(/^["']|["']$/g, '');
-      if (!process.env[key.trim()]) {
-        process.env[key.trim()] = value;
-      }
+  envFile.split(/\r?\n/).forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+    const eqIndex = trimmed.indexOf('=');
+    if (eqIndex === -1) return;
+    const key = trimmed.slice(0, eqIndex).trim();
+    const value = trimmed.slice(eqIndex + 1).trim().replace(/^["']|["']$/g, '');
+    if (key && value && !process.env[key]) {
+      process.env[key] = value;
     }
   });
-} catch (error) {
+} catch {
   // .env.local doesn't exist, that's okay
 }
 
@@ -37,6 +39,9 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/hospit
 
 async function seedDatabase() {
   try {
+    if (!process.env.MONGODB_URI) {
+      console.error('MONGODB_URI not set. Using default or add it to .env.local in the project root (same folder as package.json).');
+    }
     // Connect to MongoDB
     console.log('Connecting to MongoDB...');
     console.log(`Using connection string: ${MONGODB_URI.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')}`);
@@ -248,21 +253,16 @@ async function seedDatabase() {
     process.exit(0);
   } catch (error: any) {
     console.error('\n❌ Error seeding database');
+    console.error('   Message:', error?.message || error);
     
-    if (error.name === 'MongooseServerSelectionError' || error.code === 'ECONNREFUSED') {
-      console.error('\n🔴 MongoDB Connection Error:');
-      console.error('   MongoDB is not running or not accessible.');
-      console.error('\n📝 Solutions:');
-      console.error('   1. Make sure MongoDB is installed and running');
-      console.error('   2. If using local MongoDB, start it with: mongod');
-      console.error('   3. If using MongoDB Atlas, set MONGODB_URI in .env.local');
-      console.error('\n💡 To set up MongoDB connection:');
-      console.error('   Create a .env.local file in the project root with:');
-      console.error('   MONGODB_URI=mongodb://localhost:27017/hospital-booking');
-      console.error('   OR for MongoDB Atlas:');
-      console.error('   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/hospital-booking');
-    } else {
-      console.error('   Error details:', error.message);
+    if (error.name === 'MongooseServerSelectionError' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+      console.error('\n🔴 MongoDB Connection Error');
+      console.error('\n📝 If using MongoDB Atlas:');
+      console.error('   1. Go to https://cloud.mongodb.com → your project → Network Access');
+      console.error('   2. Click "Add IP Address" and add your current IP (or 0.0.0.0/0 to allow all)');
+      console.error('   3. If the cluster is paused, click "Resume"');
+      console.error('   4. Check Database Access: user must have read/write on the database');
+      console.error('\n📝 If using local MongoDB: start it with: mongod');
     }
     
     if (mongoose.connection.readyState === 1) {

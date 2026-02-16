@@ -84,11 +84,11 @@ export async function GET(request: Request) {
         let bValue = '';
         
         if (sortBy.startsWith('doctor')) {
-          aValue = typeof a.doctorId === 'object' && a.doctorId ? a.doctorId.name : '';
-          bValue = typeof b.doctorId === 'object' && b.doctorId ? b.doctorId.name : '';
+          aValue = (a.doctorId as { name?: string } | null)?.name ?? '';
+          bValue = (b.doctorId as { name?: string } | null)?.name ?? '';
         } else if (sortBy.startsWith('department')) {
-          aValue = typeof a.departmentId === 'object' && a.departmentId ? a.departmentId.name : '';
-          bValue = typeof b.departmentId === 'object' && b.departmentId ? b.departmentId.name : '';
+          aValue = (a.departmentId as { name?: string } | null)?.name ?? '';
+          bValue = (b.departmentId as { name?: string } | null)?.name ?? '';
         }
         
         const comparison = aValue.localeCompare(bValue);

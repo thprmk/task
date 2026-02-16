@@ -5,11 +5,12 @@ import { AppointmentStatus } from '../../../../lib/types/appointment.types';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const appointment = await Appointment.findById(params.id)
+    const { id } = await params;
+    const appointment = await Appointment.findById(id)
       .populate('doctorId', 'name specialization')
       .populate('departmentId', 'name');
 
@@ -32,10 +33,11 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await params;
     const body = await request.json();
     const { status } = body;
 
@@ -48,7 +50,7 @@ export async function PATCH(
     }
 
     const appointment = await Appointment.findByIdAndUpdate(
-      params.id,
+      id,
       { status, ...body },
       { new: true, runValidators: true }
     )
@@ -74,11 +76,12 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const appointment = await Appointment.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const appointment = await Appointment.findByIdAndDelete(id);
 
     if (!appointment) {
       return NextResponse.json(

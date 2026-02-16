@@ -11,7 +11,7 @@ interface CalendarGridProps {
   startDate: Date;
   appointments: Appointment[];
   doctors: Array<{
-    _id: string;
+    _id?: string;
     name: string;
     workingHours: { start: string; end: string };
     breakTime?: { start: string; end: string };
@@ -87,8 +87,10 @@ export default function CalendarGrid({
         </div>
 
         {/* Doctor Rows */}
-        {doctors.map((doctor) => (
-          <div key={doctor._id} className="border-b border-gray-200">
+        {doctors.map((doctor, index) => {
+          const doctorId = doctor._id ?? `doc-${index}`;
+          return (
+          <div key={doctorId} className="border-b border-gray-200">
             <div className="grid grid-cols-8">
               {/* Doctor Name Column */}
               <div className="p-3 bg-gray-50 border-r border-gray-200 sticky left-0 z-5">
@@ -103,19 +105,19 @@ export default function CalendarGrid({
                 const slots = getSlotsForDoctor(doctor, day);
                 const dayAppointments = appointments.filter(
                   (apt) =>
-                    apt.doctorId === doctor._id &&
+                    apt.doctorId === doctorId &&
                     isSameDay(new Date(apt.date), day)
                 );
 
                 return (
                   <div
-                    key={`${doctor._id}-${day.toISOString()}`}
+                    key={`${doctorId}-${day.toISOString()}`}
                     className="p-2 border-r border-gray-200 last:border-r-0 bg-white min-h-[200px]"
                   >
                     {slots.length > 0 ? (
                       <div className="space-y-1">
                         {slots.map((slot) => {
-                          const appointment = getAppointmentForSlot(doctor._id, day, slot);
+                          const appointment = getAppointmentForSlot(doctorId, day, slot);
                           return (
                             <SlotCell
                               key={slot}
@@ -124,9 +126,9 @@ export default function CalendarGrid({
                               appointmentId={appointment?._id}
                               patientName={appointment?.patient.name}
                               onClick={() =>
-                                onSlotClick?.(doctor._id, day, slot, appointment)
+                                onSlotClick?.(doctorId, day, slot, appointment)
                               }
-                              isSelected={isSlotSelected(doctor._id, day, slot)}
+                              isSelected={isSlotSelected(doctorId, day, slot)}
                             />
                           );
                         })}
@@ -141,7 +143,8 @@ export default function CalendarGrid({
               })}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

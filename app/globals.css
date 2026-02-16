@@ -11,12 +11,7 @@
   --font-sans: var(--font-inter), 'Inter', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* Keep light theme for this app - no dark mode override */
 
 * {
   font-family: var(--font-inter), 'Inter', sans-serif !important;
@@ -26,4 +21,23 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), 'Inter', sans-serif !important;
+}
+
+/* Book appointment card - General Sans / Helonik (override global font) */
+.book-appointment-card,
+.book-appointment-card * {
+  font-family: 'General Sans', sans-serif !important;
+}
+.book-appointment-card h2,
+.book-appointment-card .font-helonik {
+  font-family: 'Helonik', sans-serif !important;
+}
+
+/* Hide scrollbar but keep horizontal scroll/slider behavior */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

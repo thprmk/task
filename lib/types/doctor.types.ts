@@ -17,6 +17,10 @@ export interface Doctor {
   workingHours: WorkingHours;
   breakTime?: WorkingHours;
   weeklyOff: number[]; // [0,6] for Sunday, Saturday
+  experience?: string;
+  education?: string[];
+  languages?: string[];
+  imageUrl?: string;
 }
 
 

@@ -5,14 +5,16 @@ import Department from '../../../models/Department';
 export async function GET() {
   try {
     await connectDB();
-    const departments = await Department.find({}).sort({ name: 1 });
+    const departments = await Department.find({}).sort({ name: 1 }).lean();
     return NextResponse.json({ success: true, data: departments });
   } catch (error) {
     console.error('Error fetching departments:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch departments' },
-      { status: 500 }
-    );
+    // Return empty array so UI still loads when DB is down (e.g. MongoDB not running)
+    return NextResponse.json({
+      success: true,
+      data: [],
+      _warning: 'Database unavailable. Run MongoDB and `npm run seed` to load departments.',
+    });
   }
 }
 

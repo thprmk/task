@@ -1,7 +1,6 @@
 'use client';
 
 import { Doctor } from '../../../lib/types/doctor.types';
-import Image from 'next/image';
 import { formatTimeSlot } from '../../lib/utils/dateUtils';
 
 interface DoctorProfileHeaderProps {
@@ -19,23 +18,11 @@ export default function DoctorProfileHeader({ doctor }: DoctorProfileHeaderProps
             </div>
 
             <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start h-full relative z-10 px-4">
-                {/* Profile Image with Exact Accents */}
-                <div className="relative w-60 h-60 flex-shrink-0 flex items-center justify-center">
-                    {/* Floating Orange Accents (Left/Right bars) */}
-                    <div className="absolute left-0 top-[35%] w-4 h-36 bg-[#F05137] rounded-full -z-10" style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 85%, 0 15%)' }}></div>
-                    <div className="absolute right-0 top-[20%] w-5 h-32 bg-[#F05137] rounded-full -z-10" style={{ clipPath: 'polygon(100% 15%, 100% 85%, 0 100%, 0 0)' }}></div>
-
-                    {/* Main Hexagon Image Container */}
-                    <div className="w-[88%] h-[88%] relative bg-white p-[2px] shadow-sm" style={{ clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' }}>
-                        <div className="w-full h-full relative overflow-hidden bg-gray-50" style={{ clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' }}>
-                            <Image
-                                src={doctor.imageUrl || '/doctors/placeholder.jpg'}
-                                alt={doctor.name}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                        </div>
-                    </div>
+                {/* Placeholder avatar */}
+                <div className="w-32 h-32 flex-shrink-0 rounded-full bg-gray-200 flex items-center justify-center text-gray-400">
+                    <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
                 </div>
 
                 {/* Doctor Info */}

@@ -45,46 +45,42 @@ export default function BookingWizard() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Progress Indicator */}
+      <div className="max-w-2xl mx-auto">
+        {/* Minimal progress: compact stepper */}
         {currentStep < 7 && (
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
+          <div className="mb-6">
+            <div className="flex items-center gap-1">
               {steps.slice(0, 6).map((step, index) => (
-                <div key={step.number} className="flex items-center flex-1">
-                  <div className="flex flex-col items-center flex-1">
-                    <div
-                      className={`
-                        w-10 h-10 rounded-full flex items-center justify-center font-semibold
-                        ${
-                          currentStep >= step.number
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 text-gray-600'
-                        }
-                      `}
-                    >
-                      {step.number}
-                    </div>
-                    <span className="mt-2 text-xs text-gray-600 hidden sm:block">
-                      {step.title}
-                    </span>
+                <div key={step.number} className="flex items-center flex-1 min-w-0">
+                  <div
+                    className={`
+                      flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-colors
+                      ${currentStep > step.number ? 'bg-[#F05137] text-white' : ''}
+                      ${currentStep === step.number ? 'bg-[#F05137] text-white ring-2 ring-[#F05137]/30' : ''}
+                      ${currentStep < step.number ? 'bg-gray-200 text-gray-500' : ''}
+                    `}
+                  >
+                    {currentStep > step.number ? '✓' : step.number}
                   </div>
                   {index < 5 && (
                     <div
                       className={`
-                        h-1 flex-1 mx-2
-                        ${currentStep > step.number ? 'bg-blue-600' : 'bg-gray-200'}
+                        flex-1 h-0.5 mx-0.5 rounded
+                        ${currentStep > step.number ? 'bg-[#F05137]' : 'bg-gray-200'}
                       `}
                     />
                   )}
                 </div>
               ))}
             </div>
+            <p className="mt-2 text-xs text-gray-500 text-center">
+              {steps[currentStep - 1]?.title}
+            </p>
           </div>
         )}
 
         {/* Step Content */}
-        <div className="mt-8">{renderStep()}</div>
+        <div className="mt-6">{renderStep()}</div>
       </div>
     </div>
   );
