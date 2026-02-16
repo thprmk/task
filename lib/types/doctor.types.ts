@@ -2,6 +2,8 @@ export interface Department {
   _id?: string;
   name: string;
   description?: string;
+  isActive?: boolean;
+  icon?: string;
 }
 
 export interface WorkingHours {
@@ -17,6 +19,7 @@ export interface Doctor {
   workingHours: WorkingHours;
   breakTime?: WorkingHours;
   weeklyOff: number[]; // [0,6] for Sunday, Saturday
+  slotDuration?: number; // minutes, default 30
   experience?: string;
   education?: string[];
   languages?: string[];

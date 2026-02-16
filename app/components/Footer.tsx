@@ -5,29 +5,20 @@ import Image from 'next/image';
 
 export default function Footer() {
   return (
-    <footer className="bg-white w-full">
+    <footer className="bg-white w-full min-w-0 overflow-x-hidden">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-24 xl:gap-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 box-border">
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-24 xl:gap-32">
           {/* Left Column - Company Info & Social Media */}
-          <div className="space-y-4 sm:space-y-5 lg:max-w-xs">
-            {/* Logo Placeholder */}
-            {/* Logo */}
-            <div className="mb-4">
+          <div className="space-y-3 sm:space-y-5 lg:max-w-xs">
+            <div className="mb-2 sm:mb-4">
               <Link href="/" className="inline-block">
                 <Image
                   src="/logo.png"
                   alt="SRM Prime Hospital"
                   width={149}
                   height={62}
-                  className="rounded-[7px]"
-                  style={{
-                    width: '149px',
-                    height: '62px',
-                    objectFit: 'contain',
-                    transform: 'rotate(0deg)',
-                    opacity: 1
-                  }}
+                  className="rounded-[7px] w-[120px] h-[50px] sm:w-[149px] sm:h-[62px] object-contain"
                   priority
                 />
               </Link>
@@ -40,13 +31,13 @@ export default function Footer() {
             </div>
 
             {/* Social Media */}
-            <div className="pt-2">
-              <h3 className="font-bold text-black mb-3 sm:mb-4 text-sm sm:text-base">Social Media</h3>
-              <div className="flex gap-2 sm:gap-3">
+            <div className="pt-1 sm:pt-2">
+              <h3 className="font-bold text-black mb-2 sm:mb-4 text-sm sm:text-base">Social Media</h3>
+              <div className="flex gap-3 sm:gap-3">
                 {/* Facebook */}
                 <a
                   href="#"
-                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-black hover:text-blue-600 transition-colors"
+                  className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-black hover:text-blue-600 transition-colors touch-manipulation"
                   aria-label="Facebook"
                 >
                   <svg
@@ -62,7 +53,7 @@ export default function Footer() {
                 {/* Twitter/X */}
                 <a
                   href="#"
-                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-black hover:text-gray-900 transition-colors"
+                  className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-black hover:text-gray-900 transition-colors touch-manipulation"
                   aria-label="Twitter"
                 >
                   <svg
@@ -78,7 +69,7 @@ export default function Footer() {
                 {/* Instagram */}
                 <a
                   href="#"
-                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-black hover:text-pink-600 transition-colors"
+                  className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-black hover:text-pink-600 transition-colors touch-manipulation"
                   aria-label="Instagram"
                 >
                   <svg
@@ -94,7 +85,7 @@ export default function Footer() {
                 {/* LinkedIn */}
                 <a
                   href="#"
-                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-black hover:text-blue-700 transition-colors"
+                  className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-black hover:text-blue-700 transition-colors touch-manipulation"
                   aria-label="LinkedIn"
                 >
                   <svg
@@ -111,33 +102,33 @@ export default function Footer() {
           </div>
 
           {/* Right Side - All Link Columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-8 lg:flex-1 lg:justify-end lg:ml-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6 sm:gap-8 lg:gap-8 lg:flex-1 lg:justify-end lg:ml-auto">
             {/* Second Column - Community */}
             <div>
-              <h3 className="font-semibold text-black mb-3 sm:mb-4 text-base sm:text-lg">Community</h3>
-              <ul className="space-y-2 sm:space-y-2.5">
+              <h3 className="font-semibold text-black mb-2 sm:mb-4 text-sm sm:text-lg">Community</h3>
+              <ul className="space-y-1.5 sm:space-y-2.5">
                 <li>
-                  <Link href="#" className="text-gray-900 hover:text-black transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-gray-900 hover:text-black transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Doctors
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Testimonials
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     FAQs
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Blog
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Site Map
                   </Link>
                 </li>
@@ -146,30 +137,30 @@ export default function Footer() {
 
             {/* Third Column - About */}
             <div>
-              <h3 className="font-semibold text-black mb-3 sm:mb-4 text-base sm:text-lg">About</h3>
-              <ul className="space-y-2 sm:space-y-2.5">
+              <h3 className="font-semibold text-black mb-2 sm:mb-4 text-sm sm:text-lg">About</h3>
+              <ul className="space-y-1.5 sm:space-y-2.5">
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Services
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Specilatices
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Areas Of Care
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Volunteers
                   </Link>
                 </li>
@@ -178,30 +169,30 @@ export default function Footer() {
 
             {/* Fourth Column - Support */}
             <div>
-              <h3 className="font-semibold text-black mb-3 sm:mb-4 text-base sm:text-lg">Support</h3>
-              <ul className="space-y-2 sm:space-y-2.5">
+              <h3 className="font-semibold text-black mb-2 sm:mb-4 text-sm sm:text-lg">Support</h3>
+              <ul className="space-y-1.5 sm:space-y-2.5">
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Visitor Information
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Emergency Care
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Donate
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Online Services
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Pay Your Bills
                   </Link>
                 </li>
@@ -210,20 +201,20 @@ export default function Footer() {
 
             {/* Fifth Column - Trust & Legal */}
             <div>
-              <h3 className="font-semibold text-black mb-3 sm:mb-4 text-base sm:text-lg">Trust & Legal</h3>
-              <ul className="space-y-2 sm:space-y-2.5">
+              <h3 className="font-semibold text-black mb-2 sm:mb-4 text-sm sm:text-lg">Trust & Legal</h3>
+              <ul className="space-y-1.5 sm:space-y-2.5">
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Terms & Conditions
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-0.5">
+                  <Link href="#" className="text-black hover:opacity-80 transition-colors text-xs sm:text-sm block py-1 sm:py-0.5 touch-manipulation">
                     Hospital Stay
                   </Link>
                 </li>
@@ -237,8 +228,8 @@ export default function Footer() {
       <div className="py-3 sm:py-4" style={{ backgroundColor: '#F05137' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-white text-center text-xs sm:text-sm leading-relaxed">
-            © 2026 Hospitals. All rights reserved.{' '}
-            <span className="underline">Designed & Developed by Xtracut</span>
+            <span className="block sm:inline">© 2026 Hospitals. All rights reserved.</span>{' '}
+            <span className="underline block sm:inline mt-0.5 sm:mt-0">Designed & Developed by Xtracut</span>
           </p>
         </div>
       </div>

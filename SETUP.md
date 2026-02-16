@@ -33,21 +33,26 @@ If you're getting `ECONNREFUSED` error when running `npm run seed`, it means Mon
 
 2. **Create a cluster** (free tier is fine)
 
-3. **Get your connection string**:
-   - Click "Connect" on your cluster
-   - Choose "Connect your application"
-   - Copy the connection string
+3. **Network Access**: In Atlas go to **Network Access** → **IP Access List** → **Add IP Address**. Add `0.0.0.0/0` (allow from anywhere) or your current IP. Wait 1–2 minutes for it to apply.
 
-4. **Create `.env.local` file** in the project root:
+4. **Get your connection string** (use the exact one from Atlas):
+   - In Atlas: **Database** → click **Connect** on your cluster (e.g. Cluster0)
+   - Choose **Drivers** (or "Connect your application") → **Node.js**
+   - Copy the **connection string** shown (e.g. `mongodb+srv://user:<password>@cluster0.xxxxx.mongodb.net/...`)
+   - Replace `<password>` with your database user password
+   - Add your database name in the path, e.g. change `...mongodb.net/` to `...mongodb.net/hospital` (before any `?`)
+
+5. **Create `.env.local`** in the project root with that exact string:
    ```env
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/hospital-booking
+   MONGODB_URI="<paste the connection string here>"
    ```
-   Replace `username`, `password`, and `cluster` with your actual values.
 
-5. **Run the seed script**:
+6. **Run the seed script**:
    ```bash
    npm run seed
    ```
+
+**If you see "Could not connect" or "IP not whitelisted"**: Use the connection string you **copied from the Atlas Connect dialog** (step 4). Do not build the URI by hand—Atlas gives the correct hostnames (including replica set hosts for the standard format).
 
 ### Option 3: Use Docker MongoDB
 

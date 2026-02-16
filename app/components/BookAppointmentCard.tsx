@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useBookingStore } from '../lib/stores/bookingStore';
 
@@ -12,18 +12,34 @@ const TIME_SLOTS = [
   '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM',
 ];
 
-const DATES_TO_SHOW = 6;
-const SLOTS_GRID_COLS = 4;
-const SLOTS_GRID_ROWS = 2;
-const SLOTS_VISIBLE = SLOTS_GRID_COLS * SLOTS_GRID_ROWS;
-const DATE_CHIP_WIDTH = 51.4;
-const DATE_GAP = 6;
-const SLOT_WIDTH = 80.99;
-const SLOT_GAP = 6;
 const SLIDE_TRANSITION = { type: 'tween' as const, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] as const };
 const HOVER_TRANSITION = { type: 'tween' as const, duration: 0.28, ease: [0.33, 1, 0.68, 1] as const };
 const DATE_CHIP_HOVER = { type: 'tween' as const, duration: 0.36, ease: [0.22, 1, 0.36, 1] as const };
 const TAP_TRANSITION = { type: 'tween' as const, duration: 0.12, ease: [0.4, 0, 0.2, 1] as const };
+
+function useResponsiveConfig() {
+  const [width, setWidth] = useState(1024);
+  useEffect(() => {
+    setWidth(window.innerWidth);
+    const w = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', w);
+    return () => window.removeEventListener('resize', w);
+  }, []);
+  return useMemo(() => {
+    const isNarrow = width < 640;
+    const isMedium = width >= 640 && width < 1024;
+    return {
+      datesToShow: isNarrow ? 3 : isMedium ? 4 : 6,
+      dateChipWidth: isNarrow ? 44 : isMedium ? 48 : 51.4,
+      dateGap: 6,
+      slotCols: isNarrow ? 2 : isMedium ? 3 : 4,
+      slotRows: isNarrow ? 4 : 2,
+      slotWidth: isNarrow ? 72 : isMedium ? 76 : 80.99,
+      slotGap: 6,
+      slotHeight: isNarrow ? 28 : 24.3,
+    };
+  }, [width]);
+}
 
 function getDates(count: number) {
   const dates = [];
@@ -81,6 +97,7 @@ interface BookAppointmentCardProps {
 }
 
 export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppointmentCardProps) {
+  const config = useResponsiveConfig();
   const dates = getDates(30);
   const [selectedDate, setSelectedDate] = useState(0);
   const [selectedTime, setSelectedTime] = useState(0);
@@ -89,8 +106,15 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
   const setDate = useBookingStore((s) => s.setDate);
   const setSlot = useBookingStore((s) => s.setSlot);
 
-  const maxDateScroll = Math.max(0, dates.length - DATES_TO_SHOW);
-  const maxTimeScroll = Math.max(0, TIME_SLOTS.length - SLOTS_VISIBLE);
+  const slotsVisible = config.slotCols * config.slotRows;
+  const maxDateScroll = Math.max(0, dates.length - config.datesToShow);
+  const maxTimeScroll = Math.max(0, TIME_SLOTS.length - slotsVisible);
+
+  const dateViewportWidth = config.datesToShow * config.dateChipWidth + (config.datesToShow - 1) * config.dateGap;
+  const dateStep = config.dateChipWidth + config.dateGap;
+  const slotViewportWidth = config.slotCols * config.slotWidth + (config.slotCols - 1) * config.slotGap;
+  const slotViewportHeight = config.slotRows * config.slotHeight + (config.slotRows - 1) * config.slotGap;
+  const timeStep = slotViewportWidth;
 
   const handleBookAppointments = () => {
     const dateStr = dates[selectedDate]?.value;
@@ -102,60 +126,33 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
 
   return (
     <div
-      className="flex-shrink-0 flex flex-col overflow-hidden book-appointment-card"
-      style={{
-        width: 390,
-        height: 356,
-        background: '#EDEDED',
-        borderRadius: 24,
-      }}
+      className="flex-shrink-0 flex flex-col overflow-hidden book-appointment-card w-full max-w-[390px] min-h-[320px] sm:min-h-[356px] bg-[#EDEDED] rounded-2xl sm:rounded-3xl"
     >
-      <div className="flex flex-col flex-1 min-h-0 px-4 pt-5 pb-4">
-        {/* Title - Helonik 500 22px, line-height 37px, center, #000 */}
-        <h2
-          className="text-center text-black mb-4"
-          style={{
-            fontWeight: 500,
-            fontSize: 22,
-            lineHeight: '37px',
-          }}
-        >
+      <div className="flex flex-col flex-1 min-h-0 px-3 sm:px-4 pt-4 sm:pt-5 pb-3 sm:pb-4">
+        <h2 className="text-center text-black mb-3 sm:mb-4 text-lg sm:text-[22px] leading-tight sm:leading-[37px] font-medium">
           Book an appointment
         </h2>
 
-        {/* Select Date label - General Sans 500 14px, line-height 29px, #000 */}
-        <h3
-          className="text-black mb-2"
-          style={{
-            fontFamily: 'General Sans, sans-serif',
-            fontWeight: 500,
-            fontSize: 14,
-            lineHeight: '29px',
-          }}
-        >
+        <h3 className="text-black mb-2 font-medium text-xs sm:text-sm leading-snug" style={{ fontFamily: 'General Sans, sans-serif' }}>
           Select Date
         </h3>
 
-        {/* Date row: arrows + sliding date chips */}
-        <div className="flex items-center gap-1.5 mb-5">
+        <div className="flex items-center gap-1 sm:gap-1.5 mb-4 sm:mb-5">
           <motion.button
             type="button"
             onClick={() => setDateScroll((s) => Math.max(0, s - 1))}
-            className="p-1 text-black flex-shrink-0 touch-manipulation"
+            className="p-1.5 sm:p-1 text-black flex-shrink-0 touch-manipulation rounded"
             aria-label="Previous dates"
             whileHover={{ scale: 1.08, transition: HOVER_TRANSITION }}
             whileTap={{ scale: 0.96, transition: TAP_TRANSITION }}
           >
             <ChevronLeft className="w-5 h-5" />
           </motion.button>
-          <div
-            className="overflow-hidden flex-1 min-w-0"
-            style={{ width: DATES_TO_SHOW * DATE_CHIP_WIDTH + (DATES_TO_SHOW - 1) * DATE_GAP }}
-          >
+          <div className="overflow-hidden flex-1 min-w-0" style={{ width: dateViewportWidth }}>
             <motion.div
               className="flex gap-1.5"
-              style={{ width: dates.length * DATE_CHIP_WIDTH + (dates.length - 1) * DATE_GAP }}
-              animate={{ x: -dateScroll * (DATE_CHIP_WIDTH + DATE_GAP) }}
+              style={{ width: dates.length * config.dateChipWidth + (dates.length - 1) * config.dateGap }}
+              animate={{ x: -dateScroll * dateStep }}
               transition={SLIDE_TRANSITION}
             >
               {dates.map((d, globalIdx) => {
@@ -165,49 +162,23 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
                     key={d.value}
                     type="button"
                     onClick={() => setSelectedDate(globalIdx)}
-                    className="flex flex-col items-center justify-center flex-shrink-0 box-border"
+                    className="flex flex-col items-center justify-center flex-shrink-0 box-border rounded-md border border-white shadow-sm min-h-[50px] sm:min-h-[55px]"
                     style={{
-                      width: DATE_CHIP_WIDTH,
+                      width: config.dateChipWidth,
                       height: 55.48,
                       background: isSelected ? '#F05137' : '#FFFFFF',
-                      border: '1.1517px solid #FFFFFF',
-                      boxShadow: '0px 0px 1.81173px rgba(0, 0, 0, 0.16)',
-                      borderRadius: 5.96988,
+                      fontFamily: 'General Sans, sans-serif',
                     }}
                     whileHover={{ scale: 1.03, transition: DATE_CHIP_HOVER }}
                     whileTap={{ scale: 0.98, transition: TAP_TRANSITION }}
                   >
-                    <span
-                      style={{
-                        fontFamily: 'General Sans, sans-serif',
-                        fontWeight: 500,
-                        fontSize: 8.8269,
-                        lineHeight: '12px',
-                        color: isSelected ? '#FFFFFF' : '#555555',
-                      }}
-                    >
+                    <span className={isSelected ? 'text-white' : 'text-[#555555]'} style={{ fontWeight: 500, fontSize: 8.8269, lineHeight: '12px' }}>
                       {d.month}
                     </span>
-                    <span
-                      style={{
-                        fontFamily: 'General Sans, sans-serif',
-                        fontWeight: 600,
-                        fontSize: 13.8708,
-                        lineHeight: '19px',
-                        color: isSelected ? '#FFFFFF' : '#555555',
-                      }}
-                    >
+                    <span className={isSelected ? 'text-white' : 'text-[#555555]'} style={{ fontWeight: 600, fontSize: 13.8708, lineHeight: '19px' }}>
                       {d.day}
                     </span>
-                    <span
-                      style={{
-                        fontFamily: 'General Sans, sans-serif',
-                        fontWeight: 500,
-                        fontSize: 8.19641,
-                        lineHeight: '11px',
-                        color: isSelected ? '#FFFFFF' : '#555555',
-                      }}
-                    >
+                    <span className={isSelected ? 'text-white' : 'text-[#555555]'} style={{ fontWeight: 500, fontSize: 8.19641, lineHeight: '11px' }}>
                       {d.dayName}
                     </span>
                   </motion.button>
@@ -218,7 +189,7 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
           <motion.button
             type="button"
             onClick={() => setDateScroll((s) => Math.min(maxDateScroll, s + 1))}
-            className="p-1 text-black flex-shrink-0 touch-manipulation"
+            className="p-1.5 sm:p-1 text-black flex-shrink-0 touch-manipulation rounded"
             aria-label="Next dates"
             whileHover={{ scale: 1.08, transition: HOVER_TRANSITION }}
             whileTap={{ scale: 0.96, transition: TAP_TRANSITION }}
@@ -227,83 +198,58 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
           </motion.button>
         </div>
 
-        {/* Separator - Line 15 */}
-        <div
-          className="flex-shrink-0 mb-3"
-          style={{ height: 0, borderTop: '1px solid #E0E0E0', width: '100%' }}
-        />
+        <div className="flex-shrink-0 mb-3 border-t border-[#E0E0E0] w-full" />
 
-        {/* Available Slots label */}
-        <h3
-          className="text-black mb-2"
-          style={{
-            fontFamily: 'General Sans, sans-serif',
-            fontWeight: 500,
-            fontSize: 14,
-            lineHeight: '29px',
-          }}
-        >
+        <h3 className="text-black mb-2 font-medium text-xs sm:text-sm leading-snug" style={{ fontFamily: 'General Sans, sans-serif' }}>
           Available Slots
         </h3>
 
-        {/* Time slots: arrows + sliding 4x2 grid */}
-        <div className="flex items-center gap-1.5 mb-4">
+        <div className="flex items-center gap-1 sm:gap-1.5 mb-3 sm:mb-4">
           <motion.button
             type="button"
             onClick={() => setTimeScroll((s) => Math.max(0, s - 1))}
-            className="p-1 text-black flex-shrink-0 touch-manipulation"
+            className="p-1.5 sm:p-1 text-black flex-shrink-0 touch-manipulation rounded"
             aria-label="Previous slots"
             whileHover={{ scale: 1.08, transition: HOVER_TRANSITION }}
             whileTap={{ scale: 0.96, transition: TAP_TRANSITION }}
           >
             <ChevronLeft className="w-5 h-5" />
           </motion.button>
-          <div
-            className="flex-1 min-w-0 overflow-hidden"
-            style={{
-              width: SLOTS_GRID_COLS * SLOT_WIDTH + (SLOTS_GRID_COLS - 1) * SLOT_GAP,
-              height: SLOTS_GRID_ROWS * 24.3 + (SLOTS_GRID_ROWS - 1) * SLOT_GAP,
-            }}
-          >
+          <div className="flex-1 min-w-0 overflow-hidden" style={{ width: slotViewportWidth, height: slotViewportHeight }}>
             <motion.div
-              className="flex"
+              className="flex h-full"
               style={{
-                width: Math.ceil(TIME_SLOTS.length / SLOTS_VISIBLE) * (SLOTS_GRID_COLS * SLOT_WIDTH + (SLOTS_GRID_COLS - 1) * SLOT_GAP),
+                width: Math.ceil(TIME_SLOTS.length / slotsVisible) * timeStep,
                 height: '100%',
               }}
-              animate={{
-                x: -timeScroll * (SLOTS_GRID_COLS * SLOT_WIDTH + (SLOTS_GRID_COLS - 1) * SLOT_GAP),
-              }}
+              animate={{ x: -timeScroll * timeStep }}
               transition={SLIDE_TRANSITION}
             >
-              {Array.from({ length: Math.ceil(TIME_SLOTS.length / SLOTS_VISIBLE) }).map((_, page) => (
+              {Array.from({ length: Math.ceil(TIME_SLOTS.length / slotsVisible) }).map((_, page) => (
                 <div
                   key={page}
-                  className="grid flex-shrink-0 gap-1.5"
+                  className="grid flex-shrink-0 gap-1.5 h-full"
                   style={{
-                    gridTemplateColumns: `repeat(${SLOTS_GRID_COLS}, ${SLOT_WIDTH}px)`,
-                    width: SLOTS_GRID_COLS * SLOT_WIDTH + (SLOTS_GRID_COLS - 1) * SLOT_GAP,
+                    gridTemplateColumns: `repeat(${config.slotCols}, ${config.slotWidth}px)`,
+                    gridTemplateRows: `repeat(${config.slotRows}, ${config.slotHeight}px)`,
+                    width: slotViewportWidth,
                   }}
                 >
-                  {TIME_SLOTS.slice(page * SLOTS_VISIBLE, page * SLOTS_VISIBLE + SLOTS_VISIBLE).map((time, idx) => {
-                    const globalIdx = page * SLOTS_VISIBLE + idx;
+                  {TIME_SLOTS.slice(page * slotsVisible, page * slotsVisible + slotsVisible).map((time, idx) => {
+                    const globalIdx = page * slotsVisible + idx;
                     const isSelected = selectedTime === globalIdx;
                     return (
                       <motion.button
                         key={`${time}-${globalIdx}`}
                         type="button"
                         onClick={() => setSelectedTime(globalIdx)}
-                        className="flex items-center justify-center box-border"
+                        className="flex items-center justify-center box-border rounded text-[7px] sm:text-[8.77px] leading-tight font-medium"
                         style={{
-                          width: SLOT_WIDTH,
-                          height: 24.3,
+                          width: config.slotWidth,
+                          height: config.slotHeight,
                           background: isSelected ? '#F05137' : '#FFFFFF',
-                          border: isSelected ? 'none' : '0.674956px solid #BCBABA',
-                          borderRadius: 3.37478,
+                          border: isSelected ? 'none' : '0.67px solid #BCBABA',
                           fontFamily: 'General Sans, sans-serif',
-                          fontWeight: 500,
-                          fontSize: 8.77443,
-                          lineHeight: '12px',
                           color: isSelected ? '#FFFFFF' : '#000000',
                         }}
                         whileHover={{ scale: 1.03, transition: HOVER_TRANSITION }}
@@ -320,7 +266,7 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
           <motion.button
             type="button"
             onClick={() => setTimeScroll((s) => Math.min(maxTimeScroll, s + 1))}
-            className="p-1 text-black flex-shrink-0 touch-manipulation"
+            className="p-1.5 sm:p-1 text-black flex-shrink-0 touch-manipulation rounded"
             aria-label="Next slots"
             whileHover={{ scale: 1.08, transition: HOVER_TRANSITION }}
             whileTap={{ scale: 0.96, transition: TAP_TRANSITION }}
@@ -329,24 +275,10 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
           </motion.button>
         </div>
 
-        {/* Buttons row - gap 9px, Call + Book Appointments */}
-        <div className="flex gap-[9px] mt-auto items-center justify-center">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-[9px] mt-auto items-stretch sm:items-center justify-center">
           <motion.button
             type="button"
-            className="font-helonik flex items-center justify-center box-border"
-            style={{
-              width: 153.62,
-              height: 38.4,
-              padding: 11.1621,
-              background: '#FFFFFF',
-              border: '1.7486px solid #F05137',
-              boxShadow: '0px 0px 2.45131px rgba(0, 0, 0, 0.22)',
-              borderRadius: 83.7161,
-              fontWeight: 500,
-              fontSize: 12.6178,
-              lineHeight: '49px',
-              color: '#000000',
-            }}
+            className="font-helonik flex items-center justify-center min-h-[38px] px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-white border-2 border-[#F05137] shadow-sm font-medium text-xs sm:text-[12.6px] text-black flex-1 sm:flex-none sm:w-[153px]"
             whileHover={{ scale: 1.02, transition: HOVER_TRANSITION }}
             whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
           >
@@ -355,20 +287,7 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
           <motion.button
             type="button"
             onClick={handleBookAppointments}
-            className="font-helonik flex items-center justify-center box-border"
-            style={{
-              width: 178.13,
-              height: 38.4,
-              padding: 11.1621,
-              background: '#F05137',
-              border: '1.7486px solid #FFFFFF',
-              boxShadow: '0px 0px 2.45131px rgba(0, 0, 0, 0.22), inset 0px 0px 14.7078px #F05137',
-              borderRadius: 83.7161,
-              fontWeight: 500,
-              fontSize: 12.6178,
-              lineHeight: '49px',
-              color: '#FFFFFF',
-            }}
+            className="font-helonik flex items-center justify-center min-h-[38px] px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-[#F05137] border-2 border-white shadow-sm font-medium text-xs sm:text-[12.6px] text-white flex-1 sm:flex-none sm:w-[178px]"
             whileHover={{ scale: 1.02, transition: HOVER_TRANSITION }}
             whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
           >

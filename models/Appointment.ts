@@ -89,8 +89,9 @@ const AppointmentSchema = new Schema<IAppointment>(
 // Index to prevent double booking
 AppointmentSchema.index({ doctorId: 1, date: 1, timeSlot: 1 }, { unique: true });
 
-const Appointment: Model<IAppointment> =
-  mongoose.models.Appointment || mongoose.model<IAppointment>('Appointment', AppointmentSchema);
+const Appointment = (mongoose.models && mongoose.models.Appointment)
+  ? (mongoose.models.Appointment as Model<IAppointment>)
+  : mongoose.model<IAppointment>('Appointment', AppointmentSchema);
 
 export default Appointment;
 

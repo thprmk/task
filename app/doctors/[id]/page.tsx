@@ -70,19 +70,35 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ id: st
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20 pt-10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <Breadcrumbs doctorName={doctor.name} />
+        <>
+            <style dangerouslySetInnerHTML={{ __html: `
+                @media (min-width: 1024px) {
+                    main .doctor-profile-page {
+                        margin-left: -174px !important;
+                        margin-right: -87px !important;
+                        width: calc(100% + 261px) !important;
+                        max-width: none !important;
+                    }
+                    main .doctor-profile-page .doctor-profile-block {
+                        padding-left: 111px !important;
+                    }
+                }
+            `}} />
+            <div className="doctor-profile-page min-h-screen bg-gray-50 pb-20 pt-10">
+                <section className="doctor-profile-block w-full">
+                    <div className="w-full max-w-[1120px] flex flex-col items-start pt-6">
+                    <Breadcrumbs doctorName={doctor.name} />
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                    <div className="lg:col-span-8 h-full">
-                        <DoctorProfileHeader doctor={doctor} />
-                    </div>
-                    <div className="lg:col-span-4 h-full">
-                        <BookingWidget doctor={doctor} onBookClick={handleBookClick} />
+                    <div className="flex flex-col lg:flex-row items-stretch gap-8 w-full">
+                        <div className="w-full lg:w-[698px] lg:min-w-[698px] lg:max-w-[698px] h-full">
+                            <DoctorProfileHeader doctor={doctor} />
+                        </div>
+                        <div className="w-full lg:w-[390px] lg:min-w-[390px] lg:max-w-[390px] lg:shrink-0 h-full">
+                            <BookingWidget doctor={doctor} onBookClick={handleBookClick} />
+                        </div>
                     </div>
                 </div>
-            </div>
+                </section>
 
             {/* Booking Modal */}
             <Modal
@@ -97,6 +113,7 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ id: st
                     {currentStep === 7 && <Step7Success />}
                 </div>
             </Modal>
-        </div>
+            </div>
+        </>
     );
 }

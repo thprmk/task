@@ -2,7 +2,6 @@
 
 import { useBookingStore } from '../../lib/stores/bookingStore';
 import { formatDateDisplay, formatTimeSlot } from '../../lib/utils/dateUtils';
-import { Card } from '../ui';
 import Button from '../ui/Button';
 
 export default function Step7Success() {
@@ -20,12 +19,16 @@ export default function Step7Success() {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto">
-      <div className="text-center space-y-6 py-8">
+    <div className="max-w-2xl mx-auto px-1">
+      <header className="mb-4">
+        <h2 className="text-xl font-semibold text-gray-900 tracking-tight">Appointment Booked Successfully!</h2>
+        <p className="text-sm text-gray-500 mt-0.5">Your appointment has been confirmed. You will receive a confirmation email shortly.</p>
+      </header>
+      <div className="space-y-4">
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center border border-green-200">
             <svg
-              className="w-8 h-8 text-green-600"
+              className="w-6 h-6 text-green-600"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -38,16 +41,7 @@ export default function Step7Success() {
           </div>
         </div>
 
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Appointment Booked Successfully!
-          </h2>
-          <p className="text-gray-600">
-            Your appointment has been confirmed. You will receive a confirmation email shortly.
-          </p>
-        </div>
-
-        <div className="p-6 bg-gray-50 rounded-lg text-left space-y-3">
+        <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 text-left space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-600">Department:</span>
             <span className="font-medium">{selectedDepartment?.name}</span>
@@ -70,17 +64,17 @@ export default function Step7Success() {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Patient:</span>
-            <span className="font-medium">{patientDetails.name}</span>
+            <span className="font-medium">{patientDetails?.name ?? '—'}</span>
           </div>
         </div>
 
-        <div className="pt-4">
-          <Button variant="primary" onClick={handleNewBooking}>
+        <div className="pt-2">
+          <Button variant="primary" size="lg" onClick={handleNewBooking}>
             Book Another Appointment
           </Button>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
 

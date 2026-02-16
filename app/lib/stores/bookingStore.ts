@@ -18,11 +18,19 @@ export const useBookingStore = create<BookingState>((set) => ({
   ...initialState,
 
   setDepartment: (department) =>
-    set((state) => ({
-      selectedDepartment: department,
-      // Reset doctor when department changes
-      selectedDoctor: department?.name === state.selectedDepartment?.name ? state.selectedDoctor : null,
-    })),
+    set((state) => {
+      const departmentChanged =
+        department?._id !== state.selectedDepartment?._id;
+      return {
+        selectedDepartment: department,
+        selectedDoctor:
+          department?.name === state.selectedDepartment?.name
+            ? state.selectedDoctor
+            : null,
+        selectedSlot: departmentChanged ? null : state.selectedSlot,
+        selectedDate: departmentChanged ? null : state.selectedDate,
+      };
+    }),
 
   setDoctor: (doctor) => set({ selectedDoctor: doctor }),
 

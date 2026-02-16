@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { addWeeks, subWeeks, startOfWeek, format, isSameDay } from 'date-fns';
 import { Appointment, AppointmentStatus } from '../../../lib/types/appointment.types';
 import { Doctor } from '../../../lib/types/doctor.types';
+import { useAppointmentStore } from '../../lib/stores/appointmentStore';
 import { Card, Button, Modal, Select } from '../ui';
 import StatusBadge from '../ui/StatusBadge';
 import SlotCell from './SlotCell';
-import { formatDateDisplay, formatTimeSlot } from '../../lib/utils/dateUtils';
+import { formatDateDisplay, formatDateForInput, formatTimeSlot } from '../../lib/utils/dateUtils';
 import { generateSlots } from '../../lib/utils/slotManager';
 import { SlotConfig } from '../../../lib/types/booking.types';
 
@@ -23,10 +24,19 @@ export default function DoctorCalendar({ doctorId }: DoctorCalendarProps) {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const invalidationVersion = useAppointmentStore((s) => s.appointmentInvalidationVersion);
+  const prevInvalidationRef = useRef(0);
 
   useEffect(() => {
     fetchData();
   }, [doctorId, currentWeek]);
+
+  useEffect(() => {
+    if (invalidationVersion > prevInvalidationRef.current) {
+      prevInvalidationRef.current = invalidationVersion;
+      fetchData();
+    }
+  }, [invalidationVersion]);
 
   const fetchData = async () => {
     try {
@@ -40,14 +50,14 @@ export default function DoctorCalendar({ doctorId }: DoctorCalendarProps) {
         setDoctor(foundDoctor || null);
       }
 
-      // Fetch appointments for the week
-      const weekStart = currentWeek.toISOString().split('T')[0];
+      // Fetch appointments for the week (use local calendar dates so API matches)
       const weekEnd = new Date(currentWeek);
       weekEnd.setDate(weekEnd.getDate() + 6);
-      const weekEndStr = weekEnd.toISOString().split('T')[0];
+      const dateFrom = formatDateForInput(currentWeek);
+      const dateTo = formatDateForInput(weekEnd);
 
       const appointmentsRes = await fetch(
-        `/api/appointments?doctorId=${doctorId}&dateFrom=${weekStart}&dateTo=${weekEndStr}`
+        `/api/appointments?doctorId=${doctorId}&dateFrom=${dateFrom}&dateTo=${dateTo}`
       );
       const appointmentsData = await appointmentsRes.json();
       if (appointmentsData.success) {
@@ -86,6 +96,7 @@ export default function DoctorCalendar({ doctorId }: DoctorCalendarProps) {
           )
         );
         setSelectedAppointment({ ...selectedAppointment, status: newStatus });
+        useAppointmentStore.getState().bumpAppointmentInvalidation();
       }
     } catch (error) {
       console.error('Error updating status:', error);
@@ -136,7 +147,7 @@ export default function DoctorCalendar({ doctorId }: DoctorCalendarProps) {
     }
 
     const config: SlotConfig = {
-      slotDuration: 30,
+      slotDuration: doctor.slotDuration ?? 30,
       workingHours: doctor.workingHours,
       breakTime: doctor.breakTime,
       weeklyOff: doctor.weeklyOff,
@@ -146,10 +157,16 @@ export default function DoctorCalendar({ doctorId }: DoctorCalendarProps) {
     return generateSlots(config);
   };
 
+  // Get slot list from first working day so grid has rows even when week starts on off day
+  const firstWorkingDay = days.find((d) => !doctor.weeklyOff.includes(d.getDay()));
+  const slotList = firstWorkingDay ? getSlotsForDay(firstWorkingDay) : [];
+
   const getAppointmentForSlot = (date: Date, slot: string): Appointment | undefined => {
-    return appointments.find(
-      (apt) => isSameDay(new Date(apt.date), date) && apt.timeSlot === slot
-    );
+    const dateStr = formatDateForInput(date);
+    return appointments.find((apt) => {
+      const aptDateStr = formatDateForInput(new Date(apt.date));
+      return aptDateStr === dateStr && apt.timeSlot === slot;
+    });
   };
 
   return (
@@ -178,6 +195,31 @@ export default function DoctorCalendar({ doctorId }: DoctorCalendarProps) {
           </div>
         </Card>
 
+        {/* Legend: Visual slot status */}
+        <div className="mb-4 flex flex-wrap items-center gap-4 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm">
+          <span className="font-medium text-gray-700">Slot status:</span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-6 w-6 rounded border-2 border-green-300 bg-green-50" />
+            Available
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-6 w-6 rounded border-2 border-blue-300 bg-blue-50" />
+            Booked
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-6 w-6 rounded border-2 border-gray-300 bg-gray-100" />
+            Completed
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-6 w-6 rounded border-2 border-red-300 bg-red-50" />
+            Cancelled
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-6 w-6 rounded border-2 border-orange-300 bg-orange-50" />
+            No Show
+          </span>
+        </div>
+
         <Card>
           <div className="overflow-x-auto">
             <div className="min-w-full">
@@ -198,9 +240,9 @@ export default function DoctorCalendar({ doctorId }: DoctorCalendarProps) {
               </div>
 
               {/* Time Slots */}
-              {days.length > 0 && (
+              {slotList.length > 0 && (
                 <div className="divide-y divide-gray-200">
-                  {getSlotsForDay(days[0]).map((slot) => (
+                  {slotList.map((slot) => (
                     <div key={slot} className="grid grid-cols-8">
                       {/* Time Column */}
                       <div className="p-3 bg-gray-50 border-r border-gray-200 sticky left-0 z-5">

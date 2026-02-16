@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FAQItem {
@@ -10,7 +10,6 @@ interface FAQItem {
 }
 
 const faqData: FAQItem[] = [
-  // Page 1
   {
     id: 1,
     question: 'How can I book an appointment?',
@@ -31,7 +30,6 @@ const faqData: FAQItem[] = [
     question: 'Will I be informed about the cost of treatment and duration of stay at e Hospitals?',
     answer: 'Yes, our team will provide you with detailed information about treatment costs and estimated duration of stay during your consultation. You can also contact our billing department for more details.',
   },
-  // Page 2
   {
     id: 5,
     question: 'What documents do I need to bring for my appointment?',
@@ -52,7 +50,6 @@ const faqData: FAQItem[] = [
     question: 'Does Hospitals accept insurance?',
     answer: 'Yes, we accept most major insurance plans. Please contact our billing department or check with your insurance provider to confirm coverage before your visit.',
   },
-  // Page 3
   {
     id: 9,
     question: 'How do I access my medical records?',
@@ -66,14 +63,13 @@ const faqData: FAQItem[] = [
   {
     id: 11,
     question: 'Can I get a prescription refill online?',
-    answer: 'Yes, you can request prescription refills through our patient portal or by contacting your doctor\'s office directly. Some prescriptions may require a follow-up appointment.',
+    answer: "Yes, you can request prescription refills through our patient portal or by contacting your doctor's office directly. Some prescriptions may require a follow-up appointment.",
   },
   {
     id: 12,
     question: 'What parking facilities are available?',
     answer: 'We have ample parking available on-site with both covered and open parking areas. Valet parking is also available for patients with mobility issues.',
   },
-  // Page 4
   {
     id: 13,
     question: 'Are there any special accommodations for disabled patients?',
@@ -94,7 +90,6 @@ const faqData: FAQItem[] = [
     question: 'How do I find a specific doctor or specialist?',
     answer: 'You can search for doctors by name, specialty, or department through our online directory. You can also call our appointment desk for assistance in finding the right specialist.',
   },
-  // Page 5
   {
     id: 17,
     question: 'What should I do if I need to contact my doctor after hours?',
@@ -107,7 +102,7 @@ const faqData: FAQItem[] = [
   },
   {
     id: 19,
-    question: 'What is the hospital\'s policy on visitors?',
+    question: "What is the hospital's policy on visitors?",
     answer: 'Visitors are welcome during visiting hours. We typically allow 2 visitors per patient at a time. Special arrangements can be made for extended family visits with prior approval.',
   },
   {
@@ -117,31 +112,72 @@ const faqData: FAQItem[] = [
   },
 ];
 
+const CARD_RADIUS = 20;
+
+function getItemsPerPage(width: number) {
+  if (width < 640) return 4;
+  if (width < 1024) return 4;
+  return 4;
+}
+
+const PAGINATION_MOBILE_MAX = 5;
+
 export default function FAQ() {
   const [openItem, setOpenItem] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      setItemsPerPage(getItemsPerPage(w));
+      setIsMobile(w < 640);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
   const totalPages = Math.ceil(faqData.length / itemsPerPage);
+
+  const visiblePageNumbers = (() => {
+    if (!isMobile || totalPages <= PAGINATION_MOBILE_MAX) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const start = Math.max(1, Math.min(currentPage - 2, totalPages - PAGINATION_MOBILE_MAX + 1));
+    const end = Math.min(totalPages, start + PAGINATION_MOBILE_MAX - 1);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  })();
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
 
   const toggleItem = (id: number) => {
     setOpenItem(openItem === id ? null : id);
   };
 
-  // Calculate which items to show based on current page
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentFaqItems = faqData.slice(startIndex, endIndex);
 
   return (
-    <div className="bg-white py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        {/* Title */}
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal text-black text-center mb-8 sm:mb-10 lg:mb-12 px-2">
+    <div className="bg-white py-8 sm:py-10 lg:py-12 px-4 sm:px-6 flex justify-center">
+      <div
+        className="w-full max-w-[948px] mx-auto"
+        style={{ fontFamily: 'var(--font-manrope), Manrope, sans-serif' }}
+      >
+        <h1
+          className="text-black text-center mb-6 sm:mb-8 lg:mb-10 text-2xl sm:text-3xl lg:text-[40px] leading-tight lg:leading-[45px] font-medium"
+          style={{ fontFamily: "'Helonik', sans-serif" }}
+        >
           Frequently Asked Questions
         </h1>
 
-        {/* FAQ Items */}
-        <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10 lg:mb-12 relative">
+        <div className="space-y-4 sm:space-y-6 lg:space-y-[28px] mb-8 sm:mb-10">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPage}
@@ -149,104 +185,136 @@ export default function FAQ() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
               transition={{ duration: 0.15, ease: 'easeOut' }}
-              className="space-y-3 sm:space-y-4"
+              className="space-y-4 sm:space-y-6 lg:space-y-[28px]"
             >
-              {currentFaqItems.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.1, delay: index * 0.03 }}
-                  className="bg-gray-200 rounded-2xl p-4 sm:p-5 lg:p-6 cursor-pointer transition-all"
-                >
-              <div
-                className="flex items-start justify-between gap-3 sm:gap-4"
-                onClick={() => toggleItem(item.id)}
-              >
-                <h3 className="text-sm sm:text-base lg:text-lg font-normal text-black flex-1 leading-snug sm:leading-normal">
-                  {startIndex + index + 1}. {item.question}
-                </h3>
-                <motion.div
-                  className="flex-shrink-0 mt-0.5 sm:mt-0"
-                  animate={{ rotate: openItem === item.id ? 180 : 0 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                >
-                  <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6"
-                    style={{ color: openItem === item.id ? '#F05137' : '#000000' }}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </motion.div>
-              </div>
-              <AnimatePresence>
-                {openItem === item.id && (
+              {currentFaqItems.map((item, index) => {
+                const isOpen = openItem === item.id;
+                return (
                   <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    className="overflow-hidden"
+                    key={item.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.1, delay: index * 0.03 }}
+                    className="w-full"
                   >
-                     <div className="mt-3 sm:mt-4 pt-3 sm:pt-4">
-                       <motion.p
-                         initial={{ y: -10 }}
-                         animate={{ y: 0 }}
-                         exit={{ y: -10 }}
-                         transition={{ duration: 0.2 }}
-                         className="text-sm sm:text-base text-gray-900 leading-relaxed"
-                       >
-                         {item.answer}
-                       </motion.p>
-                     </div>
+                    <div
+                      className={`w-full flex items-center justify-between gap-3 cursor-pointer px-4 py-4 sm:px-5 sm:py-0 lg:px-6 min-h-[60px] sm:min-h-[75px] bg-[#E6E6E6] ${isOpen ? 'rounded-t-xl sm:rounded-t-[20px] rounded-b-none' : 'rounded-xl sm:rounded-[20px]'}`}
+                      onClick={() => toggleItem(item.id)}
+                    >
+                      <span
+                        className="flex-1 min-w-0 pr-2 sm:pr-4 text-left text-sm sm:text-base lg:text-xl font-medium leading-snug lg:leading-[27px] text-black"
+                        style={{ fontFamily: 'var(--font-manrope), Manrope, sans-serif', letterSpacing: '-0.02em' }}
+                      >
+                        {startIndex + index + 1}. {item.question}
+                      </span>
+                      <motion.div
+                        className="flex-shrink-0 w-5 h-5 sm:w-[18px] sm:h-[35px] flex items-center justify-center"
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      >
+                        <svg
+                          className="w-4 h-4 sm:w-[18.27px] sm:h-[35.13px]"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          style={{ color: isOpen ? '#F05137' : '#191919' }}
+                        >
+                          <path
+                            d="M19 9l-7 7-7-7"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </motion.div>
+                    </div>
+
+                    {/* Answer: Rectangle 118 — bg #F9F9F9, radius 0 0 20px 20px */}
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3, ease: 'easeInOut' }}
+                          className="overflow-hidden"
+                        >
+                          <div
+                            className="px-4 py-4 sm:px-5 sm:pt-4 sm:pb-5 lg:px-6 bg-[#F9F9F9] rounded-b-xl sm:rounded-b-[20px]"
+                          >
+                            <p
+                              className="text-justify text-sm sm:text-base lg:text-[17px] leading-relaxed lg:leading-[35px] font-medium text-[#3E3E3E]"
+                              style={{ fontFamily: 'var(--font-manrope), Manrope, sans-serif', letterSpacing: '-0.02em' }}
+                            >
+                              {item.answer}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
-                )}
-              </AnimatePresence>
-                </motion.div>
-              ))}
+                );
+              })}
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Pagination */}
-        <div className="flex justify-center items-center gap-3 sm:gap-4 flex-wrap px-2">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        <div className="flex flex-row items-center justify-center flex-wrap gap-2 sm:gap-[22px] min-h-[34px] py-2">
+          {isMobile && totalPages > PAGINATION_MOBILE_MAX && (
             <button
-              key={page}
+              type="button"
               onClick={() => {
-                setCurrentPage(page);
-                setOpenItem(null); // Close any open items when changing page
+                setCurrentPage((p) => Math.max(1, p - 1));
+                setOpenItem(null);
               }}
-              className={`
-                w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-normal transition-colors border
-                ${
-                  currentPage === page
-                    ? 'text-white border-transparent'
-                    : 'bg-white text-black border-gray-300 hover:border-gray-400'
-                }
-              `}
-              style={
-                currentPage === page
-                  ? { backgroundColor: '#F05137' }
-                  : undefined
-              }
-              aria-label={`Go to page ${page}`}
+              disabled={currentPage === 1}
+              className="rounded-full w-8 h-8 flex items-center justify-center shrink-0 font-medium text-sm border border-[#E2E2E2] bg-white text-black disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="Previous page"
             >
-              {page}
+              ‹
             </button>
-          ))}
+          )}
+          {visiblePageNumbers.map((page) => {
+            const isActive = currentPage === page;
+            return (
+              <button
+                key={page}
+                type="button"
+                onClick={() => {
+                  setCurrentPage(page);
+                  setOpenItem(null);
+                }}
+                className="rounded-full w-8 h-8 sm:w-[33px] sm:h-[33px] flex items-center justify-center transition-colors shrink-0 font-medium text-sm sm:text-base text-black border border-[#E2E2E2]"
+                style={{
+                  fontFamily: "'Manrope', sans-serif",
+                  background: isActive ? '#F05137' : '#FFFFFF',
+                  border: isActive ? 'none' : '1px solid #E2E2E2',
+                  boxShadow: isActive ? '0px 0px 4px rgba(0, 0, 0, 0.1)' : undefined,
+                  color: isActive ? '#FFFFFF' : '#000000',
+                }}
+                aria-label={`Go to page ${page}`}
+              >
+                {page}
+              </button>
+            );
+          })}
+          {isMobile && totalPages > PAGINATION_MOBILE_MAX && (
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentPage((p) => Math.min(totalPages, p + 1));
+                setOpenItem(null);
+              }}
+              disabled={currentPage === totalPages}
+              className="rounded-full w-8 h-8 flex items-center justify-center shrink-0 font-medium text-sm border border-[#E2E2E2] bg-white text-black disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="Next page"
+            >
+              ›
+            </button>
+          )}
         </div>
       </div>
     </div>
   );
 }
-

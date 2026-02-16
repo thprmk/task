@@ -10,7 +10,7 @@ export default function Home() {
       <section className="bg-white pb-0 flex justify-center px-4 sm:px-6 lg:px-8">
         <div
           className="w-full flex flex-col items-start"
-          style={{ paddingTop: 94, paddingLeft: 62, maxWidth: 1120 }}
+          style={{ paddingTop: 94, paddingLeft: 10, maxWidth: 1120 }}
         >
           {/* 1. Breadcrumb - Figma Group 1000001853 / Rectangle 75 */}
           <nav

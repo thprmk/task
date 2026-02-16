@@ -44,43 +44,54 @@ export default function BookingWizard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Minimal progress: compact stepper */}
+    <div className="w-full py-4">
+      <div className="max-w-2xl mx-auto w-full">
+        {/* Step progress - solid bar and circles */}
         {currentStep < 7 && (
-          <div className="mb-6">
-            <div className="flex items-center gap-1">
-              {steps.slice(0, 6).map((step, index) => (
-                <div key={step.number} className="flex items-center flex-1 min-w-0">
+          <div className="mb-5 pb-4 border-b border-gray-200">
+            <div className="flex items-start justify-between relative gap-1">
+              <div className="absolute left-0 right-0 top-3.5 h-0.5 bg-gray-200 rounded-full -z-10" />
+              <div
+                className="absolute left-0 top-3.5 h-0.5 bg-[#F05137] rounded-full -z-10 transition-all duration-300 ease-out"
+                style={{ width: `${((currentStep - 1) / (steps.length - 2)) * 100}%` }}
+              />
+              {steps.slice(0, 6).map((step) => (
+                <div key={step.number} className="relative flex flex-col items-center flex-1 min-w-0">
                   <div
                     className={`
-                      flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-colors
-                      ${currentStep > step.number ? 'bg-[#F05137] text-white' : ''}
-                      ${currentStep === step.number ? 'bg-[#F05137] text-white ring-2 ring-[#F05137]/30' : ''}
-                      ${currentStep < step.number ? 'bg-gray-200 text-gray-500' : ''}
+                      w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors duration-200
+                      ${currentStep > step.number
+                        ? 'bg-[#F05137] text-white'
+                        : currentStep === step.number
+                          ? 'bg-[#F05137] text-white ring-[3px] ring-[#F05137]/20'
+                          : 'bg-gray-200 text-gray-500'
+                      }
                     `}
                   >
-                    {currentStep > step.number ? '✓' : step.number}
+                    {currentStep > step.number ? (
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      step.number
+                    )}
                   </div>
-                  {index < 5 && (
-                    <div
-                      className={`
-                        flex-1 h-0.5 mx-0.5 rounded
-                        ${currentStep > step.number ? 'bg-[#F05137]' : 'bg-gray-200'}
-                      `}
-                    />
-                  )}
+                  <span
+                    className={`
+                      mt-1.5 text-[11px] font-medium whitespace-nowrap text-center transition-colors duration-200
+                      ${currentStep === step.number ? 'text-gray-900' : 'text-gray-500'}
+                    `}
+                  >
+                    {step.title}
+                  </span>
                 </div>
               ))}
             </div>
-            <p className="mt-2 text-xs text-gray-500 text-center">
-              {steps[currentStep - 1]?.title}
-            </p>
           </div>
         )}
 
-        {/* Step Content */}
-        <div className="mt-6">{renderStep()}</div>
+        {/* Step content */}
+        <div className="mt-5">{renderStep()}</div>
       </div>
     </div>
   );

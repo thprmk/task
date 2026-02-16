@@ -2,24 +2,26 @@ import { NextResponse } from 'next/server';
 import connectDB from '../../../lib/db';
 import Appointment from '../../../models/Appointment';
 import { AppointmentStatus } from '../../../lib/types/appointment.types';
+import '../../../models/Doctor'; // Ensure models are registered
+import '../../../models/Department';
 
 export async function GET(request: Request) {
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
-    
+
     const filters: any = {};
-    
+
     // Filter by department
     if (searchParams.get('departmentId')) {
       filters.departmentId = searchParams.get('departmentId');
     }
-    
+
     // Filter by doctor
     if (searchParams.get('doctorId')) {
       filters.doctorId = searchParams.get('doctorId');
     }
-    
+
     // Filter by status (can be multiple)
     const statusParam = searchParams.get('status');
     if (statusParam) {
@@ -29,15 +31,20 @@ export async function GET(request: Request) {
         filters.status = statusParam;
       }
     }
-    
-    // Filter by date range
-    if (searchParams.get('dateFrom')) {
-      filters.date = { ...filters.date, $gte: new Date(searchParams.get('dateFrom')!) };
+
+    // Filter by date range (full calendar day in UTC)
+    const dateFromParam = searchParams.get('dateFrom');
+    const dateToParam = searchParams.get('dateTo');
+    if (dateFromParam) {
+      const startOfDay = new Date(dateFromParam + 'T00:00:00.000Z');
+      const endOfDay = new Date(dateFromParam + 'T23:59:59.999Z');
+      if (dateToParam && dateToParam !== dateFromParam) {
+        filters.date = { $gte: startOfDay, $lte: new Date(dateToParam + 'T23:59:59.999Z') };
+      } else {
+        filters.date = { $gte: startOfDay, $lte: endOfDay };
+      }
     }
-    if (searchParams.get('dateTo')) {
-      filters.date = { ...filters.date, $lte: new Date(searchParams.get('dateTo')!) };
-    }
-    
+
     // Search by patient name, phone, or email
     const searchQuery = searchParams.get('search');
     if (searchQuery) {
@@ -51,7 +58,7 @@ export async function GET(request: Request) {
     // Build sort query
     const sortBy = searchParams.get('sortBy') || 'upcoming';
     let sortQuery: any = {};
-    
+
     switch (sortBy) {
       case 'upcoming':
         sortQuery = { date: 1, timeSlot: 1 };
@@ -77,12 +84,12 @@ export async function GET(request: Request) {
       .limit(500);
 
     // Sort by doctor or department name if needed (after populating)
-    if (sortBy === 'doctor-asc' || sortBy === 'doctor-desc' || 
-        sortBy === 'department-asc' || sortBy === 'department-desc') {
+    if (sortBy === 'doctor-asc' || sortBy === 'doctor-desc' ||
+      sortBy === 'department-asc' || sortBy === 'department-desc') {
       appointments = appointments.sort((a, b) => {
         let aValue = '';
         let bValue = '';
-        
+
         if (sortBy.startsWith('doctor')) {
           aValue = (a.doctorId as { name?: string } | null)?.name ?? '';
           bValue = (b.doctorId as { name?: string } | null)?.name ?? '';
@@ -90,7 +97,7 @@ export async function GET(request: Request) {
           aValue = (a.departmentId as { name?: string } | null)?.name ?? '';
           bValue = (b.departmentId as { name?: string } | null)?.name ?? '';
         }
-        
+
         const comparison = aValue.localeCompare(bValue);
         return sortBy.includes('desc') ? -comparison : comparison;
       });
@@ -126,10 +133,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // Normalize date to calendar day UTC (YYYY-MM-DD or ISO)
+    const dateStr = typeof body.date === 'string' && body.date.includes('T')
+      ? body.date.slice(0, 10)
+      : body.date;
+    const appointmentDate = new Date(dateStr + 'T00:00:00.000Z');
+
     const appointment = await Appointment.create({
       ...body,
       status: AppointmentStatus.PENDING,
-      date: new Date(body.date),
+      date: appointmentDate,
     });
 
     const populatedAppointment = await Appointment.findById(appointment._id)

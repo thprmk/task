@@ -1,7 +1,7 @@
 'use client';
 
 import { SortOption } from '../../../lib/types/appointment.types';
-import { Select } from '../ui';
+import { SelectField } from '../ui/Select';
 
 interface AppointmentSorterProps {
   sortBy: SortOption;
@@ -19,11 +19,12 @@ export default function AppointmentSorter({ sortBy, onSortChange }: AppointmentS
   ];
 
   return (
-    <Select
+    <SelectField
       label="Sort By"
       options={sortOptions}
       value={sortBy}
-      onChange={(e) => onSortChange(e.target.value as SortOption)}
+      onValueChange={(v) => onSortChange(v as SortOption)}
+      placeholder="Sort by..."
       className="w-full sm:w-auto"
     />
   );

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useBookingStore } from '../../lib/stores/bookingStore';
 import { Department } from '../../../lib/types/doctor.types';
 import Button from '../ui/Button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 
 export default function Step1Department() {
   const { selectedDepartment, setDepartment, setStep } = useBookingStore();
@@ -22,13 +23,15 @@ export default function Step1Department() {
       setError(null);
       const response = await fetch('/api/departments');
       const data = await response.json();
-      if (data.success) {
-        setDepartments(data.data);
-      } else {
-        setError('Failed to load departments');
+      if (!response.ok || !data.success) {
+        setError(data.error || 'Unable to load departments. Please try again.');
+        setDepartments([]);
+        return;
       }
+      setDepartments(data.data ?? []);
     } catch {
-      setError('Failed to load departments');
+      setError('Unable to load departments. Please try again.');
+      setDepartments([]);
     } finally {
       setLoading(false);
     }
@@ -40,24 +43,17 @@ export default function Step1Department() {
 
   if (loading) {
     return (
-      <div className="py-6">
-        <p className="text-sm text-gray-500 mb-4">Select a department</p>
-        <div className="grid gap-3">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-14 rounded-xl bg-gray-100 animate-pulse"
-            />
-          ))}
-        </div>
+      <div className="max-w-2xl mx-auto px-1 py-8 space-y-5">
+        <div className="h-5 w-1/3 bg-gray-100 rounded animate-pulse" />
+        <div className="h-14 w-full bg-gray-100 rounded-xl animate-pulse" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="py-6">
-        <p className="text-sm text-red-600 mb-4">{error}</p>
+      <div className="max-w-2xl mx-auto px-1 py-8 text-center">
+        <p className="text-[15px] text-red-600 mb-5">{error}</p>
         <button
           type="button"
           onClick={fetchDepartments}
@@ -69,57 +65,68 @@ export default function Step1Department() {
     );
   }
 
+  const isEmpty = departments.length === 0;
+
   return (
-    <div className="py-2">
-      <p className="text-sm text-gray-500 mb-4">Choose one department</p>
-      <div className="grid gap-3">
-        {departments.map((dept) => {
-          const isSelected = selectedDepartment?._id === dept._id;
-          return (
-            <motion.button
-              key={dept._id}
+    <div className="max-w-2xl mx-auto px-1 space-y-5">
+      <header className="space-y-1">
+        <h2 className="text-xl font-semibold text-gray-900 tracking-tight">Select Department</h2>
+        <p className="text-sm text-gray-500">Choose the medical department for your appointment.</p>
+      </header>
+      <div className="space-y-2">
+
+        {isEmpty ? (
+          <div className="py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <p className="text-sm text-gray-500 mb-3">No departments available.</p>
+            <button
               type="button"
-              onClick={() => setDepartment(dept)}
-              className="w-full text-left rounded-xl border-2 bg-white px-4 py-3.5 transition-colors"
-              style={{
-                borderColor: isSelected ? '#F05137' : '#E5E7EB',
-                backgroundColor: isSelected ? 'rgba(240, 81, 55, 0.06)' : undefined,
-              }}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              transition={{ duration: 0.15 }}
+              onClick={fetchDepartments}
+              className="text-sm font-medium text-[#F05137] hover:underline"
             >
-              <span
-                className="font-medium text-gray-900"
-                style={{ color: isSelected ? '#F05137' : undefined }}
-              >
-                {dept.name}
-              </span>
-              {dept.description && (
-                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                  {dept.description}
-                </p>
-              )}
-            </motion.button>
-          );
-        })}
+              Refresh
+            </button>
+          </div>
+        ) : (
+          <div className="pt-2">
+            <Select
+              value={selectedDepartment?._id || ""}
+              onValueChange={(value) => {
+                const dept = departments.find((d) => d._id === value);
+                if (dept) setDepartment(dept);
+              }}
+            >
+              <SelectTrigger className="w-full [&>span]:line-clamp-none [&>span]:text-left [&>span]:whitespace-normal">
+                <SelectValue placeholder="Select a department" />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((dept) => {
+                  if (dept._id == null) return null;
+                  return (
+                    <SelectItem key={dept._id} value={dept._id} className="py-3">
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="font-medium">{dept.name}</span>
+                        {dept.description && (
+                          <span className="text-xs text-gray-500 line-clamp-1">{dept.description}</span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
-      {departments.length === 0 && (
-        <p className="text-sm text-gray-500 py-4">No departments available.</p>
-      )}
-      <div className="flex justify-end mt-6">
+
+      <div className="flex justify-end pt-4">
         <Button
           variant="primary"
+          size="lg"
           onClick={handleNext}
           disabled={!selectedDepartment}
-          className="min-w-[100px]"
-          style={
-            selectedDepartment
-              ? { backgroundColor: '#F05137', borderColor: '#F05137' }
-              : undefined
-          }
+          className="min-w-[140px]"
         >
-          Next
+          Continue
         </Button>
       </div>
     </div>

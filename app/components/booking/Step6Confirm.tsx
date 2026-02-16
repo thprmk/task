@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useBookingStore } from '../../lib/stores/bookingStore';
-import { formatDateDisplay, formatTimeSlot } from '../../lib/utils/dateUtils';
-import { Card } from '../ui';
+import { formatDateDisplay, formatDateForInput, formatTimeSlot } from '../../lib/utils/dateUtils';
 import Button from '../ui/Button';
 
 export default function Step6Confirm() {
@@ -18,9 +17,21 @@ export default function Step6Confirm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const hasRequiredPatientDetails =
+    patientDetails?.name &&
+    patientDetails?.age != null &&
+    patientDetails?.gender &&
+    patientDetails?.phone &&
+    patientDetails?.email &&
+    patientDetails?.reason;
+
   const handleConfirm = async () => {
-    if (!selectedDepartment || !selectedDoctor || !selectedDate || !selectedSlot || !patientDetails.name) {
-      setError('Please complete all steps');
+    if (!selectedDepartment || !selectedDoctor || !selectedDate || !selectedSlot) {
+      setError('Please complete all steps (department, doctor, date, and time).');
+      return;
+    }
+    if (!hasRequiredPatientDetails) {
+      setError('Please complete patient details in Step 5 (name, age, gender, phone, email, and reason for visit).');
       return;
     }
 
@@ -36,7 +47,7 @@ export default function Step6Confirm() {
         body: JSON.stringify({
           doctorId: selectedDoctor._id,
           departmentId: selectedDepartment._id,
-          date: selectedDate.toISOString(),
+          date: formatDateForInput(selectedDate),
           timeSlot: selectedSlot,
           patient: patientDetails,
         }),
@@ -44,7 +55,7 @@ export default function Step6Confirm() {
 
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         setStep(7);
       } else {
         setError(data.error || 'Failed to book appointment');
@@ -61,12 +72,16 @@ export default function Step6Confirm() {
   };
 
   return (
-    <Card title="Step 6: Confirm Appointment" className="max-w-2xl mx-auto">
-      <div className="space-y-6">
-        <div className="space-y-4">
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">Appointment Details</h3>
-            <div className="space-y-2 text-sm">
+    <div className="max-w-2xl mx-auto px-1">
+      <header className="mb-4">
+        <h2 className="text-xl font-semibold text-gray-900 tracking-tight">Confirm Appointment</h2>
+        <p className="text-sm text-gray-500 mt-0.5">Review your details before confirming</p>
+      </header>
+      <div className="space-y-4">
+        <div className="space-y-3">
+          <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <h3 className="font-semibold text-gray-900 mb-2 text-sm">Appointment Details</h3>
+            <div className="space-y-1.5 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Department:</span>
                 <span className="font-medium">{selectedDepartment?.name}</span>
@@ -90,49 +105,50 @@ export default function Step6Confirm() {
             </div>
           </div>
 
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">Patient Information</h3>
-            <div className="space-y-2 text-sm">
+          <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <h3 className="font-semibold text-gray-900 mb-2 text-sm">Patient Information</h3>
+            <div className="space-y-1.5 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Name:</span>
-                <span className="font-medium">{patientDetails.name}</span>
+                <span className="font-medium">{patientDetails?.name ?? '—'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Age:</span>
-                <span className="font-medium">{patientDetails.age}</span>
+                <span className="font-medium">{patientDetails?.age ?? '—'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Gender:</span>
-                <span className="font-medium">{patientDetails.gender}</span>
+                <span className="font-medium">{patientDetails?.gender ?? '—'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Phone:</span>
-                <span className="font-medium">{patientDetails.phone}</span>
+                <span className="font-medium">{patientDetails?.phone ?? '—'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Email:</span>
-                <span className="font-medium">{patientDetails.email}</span>
+                <span className="font-medium">{patientDetails?.email ?? '—'}</span>
               </div>
-              <div className="mt-3 pt-3 border-t border-gray-200">
+              <div className="mt-2 pt-2 border-t border-gray-200">
                 <span className="text-gray-600 block mb-1">Reason for Visit:</span>
-                <span className="font-medium">{patientDetails.reason}</span>
+                <span className="font-medium">{patientDetails?.reason ?? '—'}</span>
               </div>
             </div>
           </div>
         </div>
 
         {error && (
-          <div className="p-4 bg-red-50 rounded-lg">
+          <div className="p-3 bg-red-50 rounded-lg border border-red-100">
             <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
 
         <div className="flex justify-between gap-3">
-          <Button variant="outline" onClick={handleBack} disabled={isSubmitting}>
+          <Button variant="outline" size="lg" onClick={handleBack} disabled={isSubmitting}>
             Back
           </Button>
           <Button
             variant="primary"
+            size="lg"
             onClick={handleConfirm}
             isLoading={isSubmitting}
           >
@@ -140,7 +156,7 @@ export default function Step6Confirm() {
           </Button>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
 

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useBookingStore } from '../../lib/stores/bookingStore';
 import { formatTimeSlot } from '../../lib/utils/dateUtils';
-import { Card } from '../ui';
 import Button from '../ui/Button';
 
 interface SlotData {
@@ -63,16 +62,20 @@ export default function Step4TimeSlot() {
   };
 
   return (
-    <Card title="Step 4: Select Time Slot" className="max-w-2xl mx-auto">
-      <div className="space-y-4">
+    <div className="max-w-2xl mx-auto px-1">
+      <header className="mb-4">
+        <h2 className="text-xl font-semibold text-gray-900 tracking-tight">Select Time Slot</h2>
+        <p className="text-sm text-gray-500 mt-0.5">Choose an available time for your appointment</p>
+      </header>
+      <div className="space-y-3">
         {loading && (
-          <div className="text-center py-8">
+          <div className="text-center py-6">
             <p className="text-gray-600">Loading available slots...</p>
           </div>
         )}
 
         {error && (
-          <div className="p-4 bg-red-50 rounded-lg">
+          <div className="p-3 bg-red-50 rounded-lg border border-red-100">
             <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
@@ -80,27 +83,26 @@ export default function Step4TimeSlot() {
         {!loading && !error && slotData && (
           <>
             {slotData.slots.length === 0 ? (
-              <div className="p-4 bg-yellow-50 rounded-lg">
-                <p className="text-sm text-yellow-800">
+              <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
+                <p className="text-sm text-amber-800">
                   No available slots for this date. Please select another date.
                 </p>
               </div>
             ) : (
               <div>
-                <p className="text-sm text-gray-600 mb-4">
-                  Available time slots for {slotData.doctor.name}
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                <p className="text-sm text-gray-600 mb-3">Available time slots for {slotData.doctor.name}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {slotData.slots.map((slot) => (
                     <button
                       key={slot}
+                      type="button"
                       onClick={() => handleSlotSelect(slot)}
                       className={`
-                        px-4 py-3 rounded-lg border-2 transition-all
+                        px-3 py-2.5 rounded-lg border-2 transition-all text-sm font-medium
                         ${
                           selectedSlot === slot
-                            ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium'
-                            : 'border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50'
+                            ? 'border-[#F05137] bg-[#F05137]/10 text-[#F05137]'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-[#F05137]/50 hover:bg-[#F05137]/5'
                         }
                       `}
                     >
@@ -114,19 +116,20 @@ export default function Step4TimeSlot() {
         )}
 
         {selectedSlot && (
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+          <div className="mt-3 p-3 bg-[#F05137]/5 rounded-lg border border-[#F05137]/20">
             <p className="text-sm text-gray-700">
               Selected slot: <span className="font-medium">{formatTimeSlot(selectedSlot)}</span>
             </p>
           </div>
         )}
 
-        <div className="flex justify-between gap-3 mt-6">
-          <Button variant="outline" onClick={handleBack}>
+        <div className="flex justify-between gap-3 mt-4">
+          <Button variant="outline" size="lg" onClick={handleBack}>
             Back
           </Button>
           <Button
             variant="primary"
+            size="lg"
             onClick={handleNext}
             disabled={!selectedSlot || loading}
           >
@@ -134,7 +137,7 @@ export default function Step4TimeSlot() {
           </Button>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
 

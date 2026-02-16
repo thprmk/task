@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import { AppointmentFilters as Filters, AppointmentStatus } from '../../../lib/types/appointment.types';
 import { Department } from '../../../lib/types/doctor.types';
 import { Doctor } from '../../../lib/types/doctor.types';
-import { Card, Select } from '../ui';
+import { Card, SelectField, Button } from '../ui';
 import Input from '../ui/Input';
-import Button from '../ui/Button';
 
 interface AppointmentFiltersProps {
   filters: Filters;
@@ -96,29 +95,31 @@ export default function AppointmentFilters({
     <Card title="Filters" className="mb-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Department Filter */}
-        <Select
+        <SelectField
           label="Department"
           options={departmentOptions}
           value={filters.departmentId || ''}
-          onChange={(e) =>
+          onValueChange={(v) =>
             onFiltersChange({
-              departmentId: e.target.value || undefined,
-              doctorId: undefined, // Reset doctor when department changes
+              departmentId: v || undefined,
+              doctorId: undefined,
             })
           }
+          placeholder="All Departments"
           disabled={loading}
         />
 
         {/* Doctor Filter */}
-        <Select
+        <SelectField
           label="Doctor"
           options={doctorOptions}
           value={filters.doctorId || ''}
-          onChange={(e) =>
+          onValueChange={(v) =>
             onFiltersChange({
-              doctorId: e.target.value || undefined,
+              doctorId: v || undefined,
             })
           }
+          placeholder="All Doctors"
           disabled={loading || !filters.departmentId}
         />
 
@@ -157,14 +158,14 @@ export default function AppointmentFilters({
 
       {/* Status Filter */}
       <div className="mt-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
           Status (Multiple Selection)
         </label>
         <select
           multiple
           value={filters.status || []}
           onChange={handleStatusChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="flex min-h-[100px] w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#F05137]/30 focus:ring-offset-0 focus:border-[#F05137] disabled:opacity-50"
           size={5}
         >
           {statusOptions.map((option) => (
@@ -173,7 +174,7 @@ export default function AppointmentFilters({
             </option>
           ))}
         </select>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="mt-1.5 text-sm text-gray-500">
           Hold Ctrl/Cmd to select multiple statuses
         </p>
       </div>

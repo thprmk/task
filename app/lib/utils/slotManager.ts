@@ -15,10 +15,10 @@ export function generateSlots(config: SlotConfig): string[] {
   const workStartMinutes = workStartHour * 60 + workStartMin;
   const workEndMinutes = workEndHour * 60 + workEndMin;
 
-  // Parse break time if exists
+  // Parse break time only if both start and end are present (doctor may have no break)
   let breakStartMinutes = 0;
   let breakEndMinutes = 0;
-  if (breakTime) {
+  if (breakTime?.start && breakTime?.end) {
     const [breakStartHour, breakStartMin] = breakTime.start.split(':').map(Number);
     const [breakEndHour, breakEndMin] = breakTime.end.split(':').map(Number);
     breakStartMinutes = breakStartHour * 60 + breakStartMin;
@@ -29,8 +29,8 @@ export function generateSlots(config: SlotConfig): string[] {
   let currentMinutes = workStartMinutes;
 
   while (currentMinutes + slotDuration <= workEndMinutes) {
-    // Skip break time
-    if (breakTime && currentMinutes < breakEndMinutes && currentMinutes + slotDuration > breakStartMinutes) {
+    // Skip break time (only when we have valid break start/end)
+    if (breakTime?.start && breakTime?.end && currentMinutes < breakEndMinutes && currentMinutes + slotDuration > breakStartMinutes) {
       currentMinutes = breakEndMinutes;
       continue;
     }

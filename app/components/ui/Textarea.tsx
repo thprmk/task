@@ -1,51 +1,60 @@
-import React from 'react';
+'use client';
 
-interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+import * as React from 'react';
+import { cn } from '@/app/lib/utils';
+
+const fieldLabelClass =
+  'block text-sm font-medium text-gray-700 mb-1.5';
+const fieldErrorClass = 'mt-1.5 text-sm text-red-600';
+const fieldHelperClass = 'mt-1.5 text-sm text-gray-500';
+
+const textareaBaseClass =
+  'flex min-h-[100px] w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-[#F05137]/30 focus:ring-offset-0 focus:border-[#F05137] disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50 resize-y';
+
+export interface TextareaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
   helperText?: string;
 }
 
-export default function Textarea({
-  label,
-  error,
-  helperText,
-  className = '',
-  id,
-  ...props
-}: TextareaProps) {
-  const textareaId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ label, error, helperText, className, id, ...props }, ref) => {
+    const textareaId = id ?? `textarea-${React.useId()}`;
+    return (
+      <div className="w-full space-y-0">
+        {label && (
+          <label htmlFor={textareaId} className={fieldLabelClass}>
+            {label}
+            {props.required && <span className="text-red-500 ml-0.5">*</span>}
+          </label>
+        )}
+        <textarea
+          ref={ref}
+          id={textareaId}
+          className={cn(
+            textareaBaseClass,
+            error && 'border-red-500 focus:ring-red-500/30 focus:border-red-500',
+            className
+          )}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${textareaId}-error` : helperText ? `${textareaId}-helper` : undefined}
+          {...props}
+        />
+        {error && (
+          <p id={`${textareaId}-error`} className={fieldErrorClass} role="alert">
+            {error}
+          </p>
+        )}
+        {helperText && !error && (
+          <p id={`${textareaId}-helper`} className={fieldHelperClass}>
+            {helperText}
+          </p>
+        )}
+      </div>
+    );
+  }
+);
+Textarea.displayName = 'Textarea';
 
-  return (
-    <div className="w-full">
-      {label && (
-        <label htmlFor={textareaId} className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
-          {props.required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-      )}
-      <textarea
-        id={textareaId}
-        className={`
-          w-full px-3 py-2 border rounded-lg text-gray-900 bg-white
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-          disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500
-          resize-y
-          ${error ? 'border-red-500' : 'border-gray-300'}
-          ${className}
-        `}
-        {...props}
-      />
-      {error && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
-      )}
-      {helperText && !error && (
-        <p className="mt-1 text-sm text-gray-500">{helperText}</p>
-      )}
-    </div>
-  );
-}
-
-
-
-
+export default Textarea;

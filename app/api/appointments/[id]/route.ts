@@ -41,10 +41,16 @@ export async function PATCH(
     const body = await request.json();
     const { status } = body;
 
-    // Validate status
+    // Validate status (cannot set an existing appointment to "available" — that is a slot state, not a stored status)
     if (status && !Object.values(AppointmentStatus).includes(status)) {
       return NextResponse.json(
         { success: false, error: 'Invalid status' },
+        { status: 400 }
+      );
+    }
+    if (status === AppointmentStatus.AVAILABLE) {
+      return NextResponse.json(
+        { success: false, error: 'Appointment status cannot be set to Available' },
         { status: 400 }
       );
     }
