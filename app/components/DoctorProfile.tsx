@@ -7,24 +7,10 @@ import { motion } from 'framer-motion';
 export default function DoctorProfile() {
   return (
     <motion.div
-      className="w-full max-w-[698px] min-h-0 bg-white shadow-sm relative overflow-hidden flex flex-col lg:flex-row flex-shrink-0 box-border rounded-2xl border-2 border-[#F05137]/20"
+      className="w-full max-w-[698px] min-w-0 min-h-0 bg-white shadow-sm relative overflow-hidden flex flex-col lg:flex-row flex-shrink-0 box-border rounded-2xl border-2 border-[#F05137]/20"
       whileHover={{ boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
       transition={{ duration: 0.2 }}
     >
-      {/* Watermark - behind photo area; hidden on very small screens */}
-      <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center lg:justify-start lg:pl-8 opacity-10">
-        <div className="relative w-48 h-48 sm:w-64 sm:h-64 lg:w-[298px] lg:h-[312px]">
-          <Image
-            src="/watermark.png"
-            alt=""
-            fill
-            className="object-contain"
-            aria-hidden
-            sizes="(max-width: 1024px) 256px, 298px"
-          />
-        </div>
-      </div>
-
       {/* Share icon - top right */}
       <motion.div
         className="absolute top-4 right-4 lg:top-6 lg:right-6 z-20 w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center text-[#F05137] cursor-pointer rounded-full hover:bg-[#F05137]/10"
@@ -44,14 +30,28 @@ export default function DoctorProfile() {
           src="/doctors/dr-raghul.png"
           alt="Dr. Raghul"
           fill
-          className="object-contain object-center"
+          className="object-contain object-[center_38%]"
           priority
           sizes="(max-width: 1024px) 100vw, 298px"
         />
       </div>
 
-      {/* Text content */}
-      <div className="relative z-10 flex-1 flex flex-col justify-center px-4 sm:px-6 lg:pl-10 lg:pr-4 py-5 sm:py-6 lg:py-8 min-w-0">
+      {/* Text content - watermark behind this block (right side on desktop) */}
+      <div className="relative flex-1 flex flex-col justify-center min-w-0 overflow-hidden">
+        {/* Watermark - left side, behind Dr. Raghull / Senior Consultant text */}
+        <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-start pl-4 opacity-10">
+          <div className="relative w-40 h-40 sm:w-52 sm:h-52 lg:w-56 lg:h-56">
+            <Image
+              src="/watermark.png"
+              alt=""
+              fill
+              className="object-contain object-left"
+              aria-hidden
+              sizes="(max-width: 640px) 160px, (max-width: 1024px) 208px, 224px"
+            />
+          </div>
+        </div>
+        <div className="relative z-10 px-4 sm:px-6 lg:pl-10 lg:pr-4 py-5 sm:py-6 lg:py-8">
         <h1
           className="text-black mb-1 text-xl sm:text-2xl lg:text-[28.7px] leading-tight lg:leading-[37px]"
           style={{ fontFamily: "'Helonik', sans-serif", fontWeight: 500 }}
@@ -100,6 +100,7 @@ export default function DoctorProfile() {
           <span className="text-black text-xs sm:text-[15.6px] leading-tight" style={{ fontFamily: "'Helonik', sans-serif", fontWeight: 400 }}>
             16:00 - 18:00 • Mon - Sat
           </span>
+        </div>
         </div>
       </div>
     </motion.div>

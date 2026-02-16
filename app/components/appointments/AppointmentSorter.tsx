@@ -6,9 +6,11 @@ import { SelectField } from '../ui/Select';
 interface AppointmentSorterProps {
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
+  label?: string | null;
+  className?: string;
 }
 
-export default function AppointmentSorter({ sortBy, onSortChange }: AppointmentSorterProps) {
+export default function AppointmentSorter({ sortBy, onSortChange, label = "Sort By", className }: AppointmentSorterProps) {
   const sortOptions = [
     { value: 'upcoming', label: 'Upcoming First' },
     { value: 'oldest', label: 'Oldest First' },
@@ -20,12 +22,12 @@ export default function AppointmentSorter({ sortBy, onSortChange }: AppointmentS
 
   return (
     <SelectField
-      label="Sort By"
+      label={label === null ? undefined : label}
       options={sortOptions}
       value={sortBy}
       onValueChange={(v) => onSortChange(v as SortOption)}
       placeholder="Sort by..."
-      className="w-full sm:w-auto"
+      className={className ?? "w-full sm:w-auto"}
     />
   );
 }

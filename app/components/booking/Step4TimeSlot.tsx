@@ -62,47 +62,53 @@ export default function Step4TimeSlot() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-1">
-      <header className="mb-4">
-        <h2 className="text-xl font-semibold text-gray-900 tracking-tight">Select Time Slot</h2>
-        <p className="text-sm text-gray-500 mt-0.5">Choose an available time for your appointment</p>
+    <div className="max-w-3xl mx-auto px-2 space-y-8">
+      <header className="space-y-2 text-center sm:text-left">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#010043] font-helonik tracking-tight">Select Time Slot</h2>
+        <p className="text-gray-500 font-medium">Choose an available time for your appointment.</p>
       </header>
-      <div className="space-y-3">
+      <div className="space-y-6">
         {loading && (
-          <div className="text-center py-6">
-            <p className="text-gray-600">Loading available slots...</p>
+          <div className="text-center py-12">
+            <div className="w-8 h-8 border-4 border-[#F05137] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600 font-medium">Loading available slots...</p>
           </div>
         )}
 
         {error && (
-          <div className="p-3 bg-red-50 rounded-lg border border-red-100">
-            <p className="text-sm text-red-600">{error}</p>
-          </div>
+          <p className="text-sm text-red-600 bg-red-50 p-4 rounded-xl font-medium border border-red-100 flex items-center gap-2">
+            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            {error}
+          </p>
         )}
 
         {!loading && !error && slotData && (
           <>
             {slotData.slots.length === 0 ? (
-              <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
-                <p className="text-sm text-amber-800">
-                  No available slots for this date. Please select another date.
+              <div className="p-6 bg-amber-50 rounded-xl border border-amber-100 text-center">
+                <p className="text-amber-800 font-medium mb-1">No slots available</p>
+                <p className="text-sm text-amber-600">
+                  Please go back and select another date.
                 </p>
               </div>
             ) : (
-              <div>
-                <p className="text-sm text-gray-600 mb-3">Available time slots for {slotData.doctor.name}</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-bold text-gray-700 uppercase tracking-wide">Available Slots</p>
+                  <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md">{slotData.slots.length} slots</span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                   {slotData.slots.map((slot) => (
                     <button
                       key={slot}
                       type="button"
                       onClick={() => handleSlotSelect(slot)}
                       className={`
-                        px-3 py-2.5 rounded-lg border-2 transition-all text-sm font-medium
-                        ${
-                          selectedSlot === slot
-                            ? 'border-[#F05137] bg-[#F05137]/10 text-[#F05137]'
-                            : 'border-gray-200 bg-white text-gray-700 hover:border-[#F05137]/50 hover:bg-[#F05137]/5'
+                        px-4 py-3 rounded-xl border-2 transition-all text-sm font-bold
+                        ${selectedSlot === slot
+                          ? 'border-[#F05137] bg-[#F05137] text-white shadow-lg shadow-[#F05137]/30 scale-105'
+                          : 'border-gray-100 bg-gray-50 text-gray-700 hover:border-[#F05137] hover:text-[#F05137] hover:bg-white'
                         }
                       `}
                     >
@@ -116,15 +122,26 @@ export default function Step4TimeSlot() {
         )}
 
         {selectedSlot && (
-          <div className="mt-3 p-3 bg-[#F05137]/5 rounded-lg border border-[#F05137]/20">
-            <p className="text-sm text-gray-700">
-              Selected slot: <span className="font-medium">{formatTimeSlot(selectedSlot)}</span>
-            </p>
+          <div className="p-4 bg-[#F05137]/5 rounded-xl border border-[#F05137]/10 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#F05137]/10 flex items-center justify-center text-[#F05137]">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 font-semibold uppercase tracking-wide">Selected Time</p>
+              <p className="text-gray-900 font-bold text-lg">
+                {formatTimeSlot(selectedSlot)}
+              </p>
+            </div>
           </div>
         )}
 
-        <div className="flex justify-between gap-3 mt-4">
-          <Button variant="outline" size="lg" onClick={handleBack}>
+        <div className="flex justify-between pt-6 border-t border-gray-100">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={handleBack}
+            className="border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-full h-12 px-6"
+          >
             Back
           </Button>
           <Button
@@ -132,8 +149,9 @@ export default function Step4TimeSlot() {
             size="lg"
             onClick={handleNext}
             disabled={!selectedSlot || loading}
+            className="min-w-[160px] h-12 text-base font-bold shadow-lg shadow-[#F05137]/20 rounded-full"
           >
-            Next
+            Next Step
           </Button>
         </div>
       </div>

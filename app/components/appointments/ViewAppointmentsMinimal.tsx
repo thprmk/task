@@ -16,7 +16,8 @@ import AppointmentSorter from './AppointmentSorter';
 import AppointmentSearch from './AppointmentSearch';
 import { SelectField } from '../ui/Select';
 import Input from '../ui/Input';
-import { Filter, Calendar as CalendarIcon, Clock, AlertCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, AlertCircle } from 'lucide-react';
+import { Button } from '../ui';
 
 interface ViewAppointmentsMinimalProps {
   initialDate?: Date | null;
@@ -193,174 +194,135 @@ export default function ViewAppointmentsMinimal({
   const timeOptions = TIME_SLOT_OPTIONS.map(opt => ({ value: opt, label: opt }));
 
   return (
-    <div className="space-y-6">
-      {/* Search & Sort & Filter Toggle */}
-      <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-        <div className="w-full lg:w-96">
-          <AppointmentSearch onSearchChange={setSearch} />
-        </div>
-        <div className="flex w-full lg:w-auto gap-3">
-          <AppointmentSorter sortBy={sortBy} onSortChange={setSortBy} />
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${showFilters
-                ? 'bg-blue-50 border-blue-200 text-blue-700'
-                : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-          >
-            <Filter size={16} />
-            Filters
-          </button>
+    <div className="space-y-4 sm:space-y-6 min-w-0">
+      {/* Filter bar - responsive: stack on mobile, row on xl */}
+      <div className="rounded-lg border border-slate-200/80 bg-white shadow-md overflow-hidden sm:rounded-xl min-w-0">
+        <div className="p-3 sm:p-4 md:p-5 flex flex-col xl:flex-row gap-3 sm:gap-4 items-stretch xl:items-end min-w-0">
+          <div className="w-full xl:w-72 flex-shrink-0 min-w-0">
+            <AppointmentSearch onSearchChange={setSearch} label={null} className="w-full min-w-0" />
+          </div>
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full min-w-0">
+            <SelectField
+              label="Department"
+              options={departmentOptions}
+              value={filters.departmentId || ALL_VALUE}
+              onValueChange={(v) =>
+                handleFiltersChange({
+                  departmentId: v === ALL_VALUE ? undefined : v,
+                  doctorId: undefined,
+                })
+              }
+              placeholder="All Departments"
+              className="bg-white min-w-0"
+            />
+            <SelectField
+              label="Doctor"
+              options={doctorOptions}
+              value={filters.doctorId || ALL_VALUE}
+              onValueChange={(v) =>
+                handleFiltersChange({ doctorId: v === ALL_VALUE ? undefined : v })
+              }
+              placeholder="All Doctors"
+              disabled={!filters.departmentId}
+              className="bg-white min-w-0"
+            />
+            <SelectField
+              label="Status"
+              options={statusOptions}
+              value={filters.status?.[0] ?? ALL_VALUE}
+              onValueChange={(v) =>
+                handleFiltersChange({
+                  status: v === ALL_VALUE ? undefined : ([v] as AppointmentStatus[]),
+                })
+              }
+              placeholder="All Statuses"
+              className="bg-white min-w-0"
+            />
+            <Input
+              type="date"
+              label="Date"
+              value={displayDate}
+              onChange={handleDateChange}
+              className="w-full min-h-11 sm:min-h-10 rounded-lg border-slate-200 focus:border-[#F05137] focus:ring-[#F05137]/20 bg-white text-slate-900 text-base"
+            />
+            <AppointmentSorter
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              label="Sort"
+              className="w-full bg-white min-w-0"
+            />
+          </div>
+          <div className="w-full xl:w-auto xl:shrink-0">
+            <Button variant="primary" size="sm" onClick={handleApply} className="rounded-lg w-full xl:min-w-[100px] min-h-11 sm:min-h-9 touch-manipulation">
+              Apply
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Filters Panel */}
-      {showFilters && (
-        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm transition-all animate-in fade-in slide-in-from-top-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-            <div>
-              <Input
-                type="date"
-                label="Date"
-                value={displayDate}
-                onChange={handleDateChange}
-                className="w-full"
-              />
-            </div>
-            <div>
-              <SelectField
-                label="Time"
-                options={timeOptions}
-                value={selectedTime}
-                onValueChange={handleTimeChange}
-              />
-            </div>
-            <div>
-              <SelectField
-                label="Department"
-                options={departmentOptions}
-                value={filters.departmentId || ALL_VALUE}
-                onValueChange={(v) =>
-                  handleFiltersChange({
-                    departmentId: v === ALL_VALUE ? undefined : v,
-                    doctorId: undefined,
-                  })
-                }
-                placeholder="All Departments"
-              />
-            </div>
-            <div>
-              <SelectField
-                label="Doctor"
-                options={doctorOptions}
-                value={filters.doctorId || ALL_VALUE}
-                onValueChange={(v) =>
-                  handleFiltersChange({ doctorId: v === ALL_VALUE ? undefined : v })
-                }
-                placeholder="All Doctors"
-                disabled={!filters.departmentId}
-              />
-            </div>
-            <div>
-              <SelectField
-                label="Status"
-                options={statusOptions}
-                value={filters.status?.[0] ?? ALL_VALUE}
-                onValueChange={(v) =>
-                  handleFiltersChange({
-                    status: v === ALL_VALUE ? undefined : ([v] as AppointmentStatus[]),
-                  })
-                }
-                placeholder="All Statuses"
-              />
-            </div>
+      {/* Results - card wrapper, responsive padding and grid */}
+      <div className="rounded-lg border border-slate-200/80 bg-white shadow-md overflow-hidden sm:rounded-xl min-w-0">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-12 sm:py-16 px-4">
+            <div className="w-10 h-10 border-2 border-[#F05137] border-t-transparent rounded-full animate-spin" />
+            <p className="mt-4 text-slate-600 font-medium text-sm sm:text-base">Loading appointments...</p>
           </div>
-          <div className="mt-4 flex justify-end">
+        ) : error ? (
+          <div className="p-6 sm:p-8 md:p-12 text-center border-b border-slate-100">
+            <AlertCircle className="mx-auto h-10 w-10 text-red-500 mb-3" />
+            <p className="text-slate-700 font-medium mb-2 text-sm sm:text-base break-words">{error}</p>
             <button
               type="button"
-              onClick={handleApply}
-              className="bg-[#F05137] hover:bg-[#d94830] text-white px-6 py-2 rounded-lg font-medium text-sm transition-colors shadow-sm"
+              onClick={fetchAppointments}
+              className="min-h-[44px] px-4 text-sm text-[#F05137] hover:text-[#F05137]/80 font-medium underline touch-manipulation"
             >
-              Apply Filters
+              Try again
             </button>
           </div>
-        </div>
-      )}
-
-      {/* Results */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl border border-gray-200 h-64 animate-pulse p-4">
-              <div className="flex justify-between mb-4">
-                <div className="h-10 w-10 bg-gray-100 rounded-full"></div>
-                <div className="h-6 w-20 bg-gray-100 rounded-full"></div>
-              </div>
-              <div className="h-4 w-3/4 bg-gray-100 rounded mb-2"></div>
-              <div className="h-4 w-1/2 bg-gray-100 rounded mb-6"></div>
-              <div className="space-y-2">
-                <div className="h-3 w-full bg-gray-100 rounded"></div>
-                <div className="h-3 w-full bg-gray-100 rounded"></div>
-                <div className="h-3 w-2/3 bg-gray-100 rounded"></div>
-              </div>
+        ) : appointments.length === 0 ? (
+          <div className="p-6 sm:p-8 md:p-12 text-center">
+            <div className="mx-auto h-14 w-14 sm:h-16 sm:w-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+              <CalendarIcon className="h-7 w-7 sm:h-8 sm:w-8 text-slate-400" />
             </div>
-          ))}
-        </div>
-      ) : error ? (
-        <div className="bg-red-50 rounded-xl border border-red-100 p-8 text-center">
-          <AlertCircle className="mx-auto h-10 w-10 text-red-500 mb-3" />
-          <p className="text-red-700 font-medium mb-2">{error}</p>
-          <button
-            type="button"
-            onClick={fetchAppointments}
-            className="text-sm text-red-600 hover:text-red-800 underline"
-          >
-            Try Again
-          </button>
-        </div>
-      ) : appointments.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <div className="mx-auto h-16 w-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-            <CalendarIcon className="h-8 w-8 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-1">No appointments found</h3>
-          <p className="text-gray-500">
-            Try adjusting your filters or search terms to find what you're looking for.
-          </p>
-          {(filters.departmentId || filters.doctorId || search || selectedTime !== 'All times') && (
-            <button
-              onClick={() => {
-                setFilters({});
-                setSearch('');
-                setSelectedTime('All times');
-                // optional: reset date to today or keep it? Keeping it is usually better UX
-                fetchAppointments();
-              }}
-              className="mt-4 text-[#F05137] font-medium text-sm hover:underline"
-            >
-              Clear all filters
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between text-sm text-gray-500 px-1">
-            <p>
-              Showing <span className="font-semibold text-gray-900">{appointments.length}</span> appointment{appointments.length !== 1 ? 's' : ''}
+            <h3 className="text-base sm:text-lg font-medium text-slate-900 mb-1">No appointments found</h3>
+            <p className="text-slate-500 text-xs sm:text-sm max-w-xs mx-auto">
+              Try adjusting your filters or search terms.
             </p>
+            {(filters.departmentId || filters.doctorId || search || selectedTime !== 'All times') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setFilters({});
+                  setSearch('');
+                  setSelectedTime('All times');
+                  fetchAppointments();
+                }}
+                className="mt-4 min-h-[44px] px-3 text-[#F05137] font-medium text-sm hover:underline touch-manipulation"
+              >
+                Clear all filters
+              </button>
+            )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {appointments.map((apt) => (
-              <AppointmentCard
-                key={apt._id}
-                appointment={apt}
-                onStatusUpdate={handleStatusUpdate}
-                isUpdating={updatingId === apt._id}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+        ) : (
+          <>
+            <div className="px-3 sm:px-4 md:px-5 py-2.5 border-b border-slate-100">
+              <p className="text-xs text-slate-500">
+                <span className="font-medium text-slate-700">{appointments.length}</span> appointment{appointments.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+            <div className="p-3 sm:p-4 md:p-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 min-w-0">
+              {appointments.map((apt) => (
+                <AppointmentCard
+                  key={apt._id}
+                  appointment={apt}
+                  onStatusUpdate={handleStatusUpdate}
+                  isUpdating={updatingId === apt._id}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

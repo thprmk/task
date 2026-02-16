@@ -48,76 +48,73 @@ export default function Step2Doctor() {
     setStep(1);
   };
 
-  const options = doctors.map((doctor) => ({
-    value: doctor._id || '',
-    label: `${doctor.name} - ${doctor.specialization}`,
-  }));
+  const isEmpty = doctors.length === 0 && !loading && !error;
 
   return (
-    <div className="max-w-2xl mx-auto px-1">
-      <header className="mb-4">
-        <h2 className="text-xl font-semibold text-gray-900 tracking-tight">Select Doctor</h2>
-        <p className="text-sm text-gray-500 mt-0.5">Choose a specialist for your consultation</p>
+    <div className="max-w-3xl mx-auto px-2 space-y-8">
+      <header className="space-y-2 text-center sm:text-left">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#010043] font-helonik tracking-tight">Select Doctor</h2>
+        <p className="text-gray-500 font-medium">Choose a specialist from {selectedDepartment?.name}.</p>
       </header>
 
       <div className="space-y-4">
-        <Select
-          value={selectedDoctor?._id || ''}
-          onValueChange={(value) => {
-            const doctor = doctors.find((d) => d._id === value);
-            setDoctor(doctor || null);
-          }}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a doctor" />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map((option) => (
-              <SelectItem key={option.value} value={option.value} className="py-3">
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {error && (
-          <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg flex items-center gap-2">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {error}
-          </p>
-        )}
-
-        {selectedDoctor && (
-          <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 space-y-2">
-            <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Specialization</p>
-              <p className="text-gray-900 font-medium">{selectedDoctor.specialization}</p>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Working Hours</p>
-              <p className="text-gray-900 font-medium">
-                {selectedDoctor.workingHours.start} - {selectedDoctor.workingHours.end}
-              </p>
-            </div>
+        {isEmpty ? (
+          <div className="py-12 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+            <p className="text-gray-500 mb-4 font-medium">No doctors available in this department.</p>
+            <Button variant="outline" onClick={() => setStep(1)} className="font-bold">
+              Change Department
+            </Button>
+          </div>
+        ) : (
+          <div className="pt-2">
+            <Select
+              value={selectedDoctor?._id || ""}
+              onValueChange={(value) => {
+                const doc = doctors.find((d) => d._id === value);
+                if (doc) setDoctor(doc);
+              }}
+            >
+              <SelectTrigger className="w-full h-14 text-lg bg-gray-50 border-gray-200 focus:ring-[#F05137]/20 focus:border-[#F05137] rounded-xl transition-all duration-200">
+                <SelectValue placeholder="Select a doctor" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-gray-100 shadow-xl">
+                {doctors.map((doc) => {
+                  if (doc._id == null) return null;
+                  return (
+                    <SelectItem key={doc._id} value={doc._id} className="py-4 cursor-pointer focus:bg-[#FFF5F2] focus:text-[#F05137]">
+                      <div className="flex flex-col items-start gap-1.5">
+                        <span className="font-bold text-base">{doc.name}</span>
+                        {doc.specialization && (
+                          <span className="text-xs text-gray-400 font-medium uppercase tracking-wide">{doc.specialization}</span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
           </div>
         )}
+      </div>
 
-        <div className="flex justify-between gap-3 pt-2">
-          <Button variant="outline" size="lg" onClick={handleBack} className="min-w-[100px]">
-            Back
-          </Button>
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={handleNext}
-            disabled={!selectedDoctor || loading}
-            className="min-w-[120px]"
-          >
-            Next Step
-          </Button>
-        </div>
+      <div className="flex justify-between pt-6 border-t border-gray-100">
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={handleBack}
+          className="border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-full h-12 px-6"
+        >
+          Back
+        </Button>
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={handleNext}
+          disabled={!selectedDoctor}
+          className="min-w-[160px] h-12 text-base font-bold shadow-lg shadow-[#F05137]/20 rounded-full"
+        >
+          Continue
+        </Button>
       </div>
     </div>
   );

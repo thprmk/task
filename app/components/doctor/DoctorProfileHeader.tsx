@@ -149,28 +149,20 @@ export default function DoctorProfileHeader({ doctor }: DoctorProfileHeaderProps
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: FLUID.duration + 0.1, ease: FLUID.ease }}
         >
-          {doctor.imageUrl ? (
-            <motion.div
-              className="relative w-full h-full lg:rounded-r-[20px] overflow-hidden"
-              whileHover={{ scale: 1.03 }}
-              transition={{ duration: 0.5, ease: FLUID.ease }}
-            >
-              <Image
-                src={doctor.imageUrl}
-                alt={doctor.name}
-                fill
-                className="object-cover object-center"
-                sizes="(max-width: 1024px) 100vw, 298px"
-              />
-              <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/5 to-transparent lg:rounded-r-[20px]" />
-            </motion.div>
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 lg:rounded-r-[20px]">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-              </svg>
-            </div>
-          )}
+          <motion.div
+            className="relative w-full h-full lg:rounded-r-[20px] overflow-hidden"
+            whileHover={{ scale: 1.03 }}
+            transition={{ duration: 0.5, ease: FLUID.ease }}
+          >
+            <Image
+              src={doctor.imageUrl || '/doctors/dr-raghul.png'}
+              alt={doctor.name}
+              fill
+              className="object-cover object-[center_38%]"
+              sizes="(max-width: 1024px) 100vw, 298px"
+            />
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/5 to-transparent lg:rounded-r-[20px]" />
+          </motion.div>
         </motion.div>
       </div>
     </motion.div>

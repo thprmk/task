@@ -27,9 +27,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${manrope.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${manrope.variable} overflow-x-hidden`} suppressHydrationWarning>
       <body
-        className={`${inter.className} antialiased flex flex-col min-h-screen min-w-0 bg-gray-50 overflow-x-hidden`}
+        className={`${inter.className} antialiased flex flex-col min-h-screen min-w-0 bg-gray-50`}
         suppressHydrationWarning
       >
         <Header />

@@ -9,7 +9,7 @@ const fieldErrorClass = 'mt-1.5 text-sm text-red-600';
 const fieldHelperClass = 'mt-1.5 text-sm text-gray-500';
 
 const inputBaseClass =
-  'flex h-10 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-[#F05137]/30 focus:ring-offset-0 focus:border-[#F05137] disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50';
+  'flex h-11 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-[#F05137]/20 focus:ring-offset-0 focus:border-[#F05137] disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50 shadow-sm hover:border-gray-300';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -18,8 +18,9 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, helperText, className, id, ...props }, ref) => {
+  ({ label, error, helperText, className, id, type, ...props }, ref) => {
     const inputId = id ?? `input-${React.useId()}`;
+    const isDateInput = type === 'date' || type === 'datetime-local' || type === 'time';
     return (
       <div className="w-full space-y-0">
         {label && (
@@ -31,8 +32,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={inputId}
+          type={type}
           className={cn(
             inputBaseClass,
+            isDateInput && 'pr-14 min-w-[160px]', // reserve right space for native calendar icon so it displays fully
             error && 'border-red-500 focus:ring-red-500/30 focus:border-red-500',
             className
           )}

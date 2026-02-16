@@ -126,14 +126,17 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
 
   return (
     <div
-      className="flex-shrink-0 flex flex-col overflow-hidden book-appointment-card w-full max-w-[390px] min-h-[320px] sm:min-h-[356px] bg-[#EDEDED] rounded-2xl sm:rounded-3xl"
+      className="flex-shrink-0 flex flex-col overflow-hidden book-appointment-card w-full max-w-[390px] min-h-[320px] sm:min-h-[356px] bg-[#EDEDED] rounded-[24px]"
     >
       <div className="flex flex-col flex-1 min-h-0 px-3 sm:px-4 pt-4 sm:pt-5 pb-3 sm:pb-4">
-        <h2 className="text-center text-black mb-3 sm:mb-4 text-lg sm:text-[22px] leading-tight sm:leading-[37px] font-medium">
+        <h2
+          className="text-center text-black mb-3 sm:mb-4 text-lg sm:text-[22px] sm:leading-[37px] font-medium"
+          style={{ fontFamily: "'Helonik', sans-serif", fontWeight: 500 }}
+        >
           Book an appointment
         </h2>
 
-        <h3 className="text-black mb-2 font-medium text-xs sm:text-sm leading-snug" style={{ fontFamily: 'General Sans, sans-serif' }}>
+        <h3 className="text-black mb-2 font-medium text-xs sm:text-sm leading-snug" style={{ fontFamily: "'General Sans', sans-serif", fontWeight: 500, fontSize: 14, lineHeight: '29px' }}>
           Select Date
         </h3>
 
@@ -162,12 +165,15 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
                     key={d.value}
                     type="button"
                     onClick={() => setSelectedDate(globalIdx)}
-                    className="flex flex-col items-center justify-center flex-shrink-0 box-border rounded-md border border-white shadow-sm min-h-[50px] sm:min-h-[55px]"
+                    className="flex flex-col items-center justify-center flex-shrink-0 box-border min-h-[50px] sm:min-h-[55px]"
                     style={{
                       width: config.dateChipWidth,
                       height: 55.48,
                       background: isSelected ? '#F05137' : '#FFFFFF',
-                      fontFamily: 'General Sans, sans-serif',
+                      fontFamily: "'General Sans', sans-serif",
+                      border: '1.1517px solid #FFFFFF',
+                      borderRadius: 5.96988,
+                      boxShadow: '0px 0px 1.81173px rgba(0, 0, 0, 0.16), inset 0px 0px 3.45511px #404040',
                     }}
                     whileHover={{ scale: 1.03, transition: DATE_CHIP_HOVER }}
                     whileTap={{ scale: 0.98, transition: TAP_TRANSITION }}
@@ -200,7 +206,7 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
 
         <div className="flex-shrink-0 mb-3 border-t border-[#E0E0E0] w-full" />
 
-        <h3 className="text-black mb-2 font-medium text-xs sm:text-sm leading-snug" style={{ fontFamily: 'General Sans, sans-serif' }}>
+        <h3 className="text-black mb-2 font-medium text-xs sm:text-sm leading-snug" style={{ fontFamily: "'General Sans', sans-serif", fontWeight: 500, fontSize: 14, lineHeight: '29px' }}>
           Available Slots
         </h3>
 
@@ -243,13 +249,14 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
                         key={`${time}-${globalIdx}`}
                         type="button"
                         onClick={() => setSelectedTime(globalIdx)}
-                        className="flex items-center justify-center box-border rounded text-[7px] sm:text-[8.77px] leading-tight font-medium"
+                        className="flex items-center justify-center box-border text-[7px] sm:text-[8.77443px] leading-tight font-medium"
                         style={{
                           width: config.slotWidth,
                           height: config.slotHeight,
                           background: isSelected ? '#F05137' : '#FFFFFF',
-                          border: isSelected ? 'none' : '0.67px solid #BCBABA',
-                          fontFamily: 'General Sans, sans-serif',
+                          border: isSelected ? 'none' : '0.674956px solid #BCBABA',
+                          borderRadius: 3.37478,
+                          fontFamily: "'General Sans', sans-serif",
                           color: isSelected ? '#FFFFFF' : '#000000',
                         }}
                         whileHover={{ scale: 1.03, transition: HOVER_TRANSITION }}
@@ -278,7 +285,14 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-[9px] mt-auto items-stretch sm:items-center justify-center">
           <motion.button
             type="button"
-            className="font-helonik flex items-center justify-center min-h-[38px] px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-white border-2 border-[#F05137] shadow-sm font-medium text-xs sm:text-[12.6px] text-black flex-1 sm:flex-none sm:w-[153px]"
+            className="flex items-center justify-center min-h-[38.4px] sm:min-h-[49px] px-4 sm:px-[11.16px] py-2.5 sm:py-[11.16px] bg-white flex-1 sm:flex-none sm:w-[153.62px] font-medium text-xs sm:text-[12.6178px] text-black text-center"
+            style={{
+              fontFamily: "'Helonik', sans-serif",
+              fontWeight: 500,
+              border: '1.7486px solid #F05137',
+              borderRadius: 83.7161,
+              boxShadow: '0px 0px 2.45131px rgba(0, 0, 0, 0.22)',
+            }}
             whileHover={{ scale: 1.02, transition: HOVER_TRANSITION }}
             whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
           >
@@ -287,7 +301,14 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
           <motion.button
             type="button"
             onClick={handleBookAppointments}
-            className="font-helonik flex items-center justify-center min-h-[38px] px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-[#F05137] border-2 border-white shadow-sm font-medium text-xs sm:text-[12.6px] text-white flex-1 sm:flex-none sm:w-[178px]"
+            className="flex items-center justify-center min-h-[38.4px] sm:min-h-[49px] px-4 sm:px-[11.16px] py-2.5 sm:py-[11.16px] bg-[#F05137] flex-1 sm:flex-none sm:w-[178.13px] font-medium text-xs sm:text-[12.6178px] text-white text-center"
+            style={{
+              fontFamily: "'Helonik', sans-serif",
+              fontWeight: 500,
+              border: '1.7486px solid #FFFFFF',
+              borderRadius: 83.7161,
+              boxShadow: '0px 0px 2.45131px rgba(0, 0, 0, 0.22), inset 0px 0px 14.7078px #F05137',
+            }}
             whileHover={{ scale: 1.02, transition: HOVER_TRANSITION }}
             whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
           >

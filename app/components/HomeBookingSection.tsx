@@ -17,9 +17,11 @@ export default function HomeBookingSection() {
 
   return (
     <>
-      <div className="flex flex-col lg:flex-row items-start justify-start gap-8 lg:gap-12 mb-8 w-full">
+      <div className="flex flex-col lg:flex-row items-stretch sm:items-start justify-start gap-6 sm:gap-8 lg:gap-12 mb-6 sm:mb-8 w-full min-w-0">
         <DoctorProfile />
-        <BookAppointmentCard onBookAppointmentClick={openBookingModal} />
+        <div className="w-full min-w-0 flex justify-center lg:justify-start">
+          <BookAppointmentCard onBookAppointmentClick={openBookingModal} />
+        </div>
       </div>
       <BookingModal
         isOpen={bookingModalOpen}

@@ -68,22 +68,23 @@ export default function Step1Department() {
   const isEmpty = departments.length === 0;
 
   return (
-    <div className="max-w-2xl mx-auto px-1 space-y-5">
-      <header className="space-y-1">
-        <h2 className="text-xl font-semibold text-gray-900 tracking-tight">Select Department</h2>
-        <p className="text-sm text-gray-500">Choose the medical department for your appointment.</p>
-      </header>
-      <div className="space-y-2">
 
+    <div className="max-w-3xl mx-auto px-2 space-y-8">
+      <header className="space-y-2 text-center sm:text-left">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#010043] font-helonik tracking-tight">Select Department</h2>
+        <p className="text-gray-500 font-medium">Choose the medical department for your appointment.</p>
+      </header>
+
+      <div className="space-y-4">
         {isEmpty ? (
-          <div className="py-10 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
-            <p className="text-sm text-gray-500 mb-3">No departments available.</p>
+          <div className="py-12 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+            <p className="text-gray-500 mb-4 font-medium">No departments available at the moment.</p>
             <button
               type="button"
               onClick={fetchDepartments}
-              className="text-sm font-medium text-[#F05137] hover:underline"
+              className="text-sm font-bold text-[#F05137] hover:underline uppercase tracking-wide"
             >
-              Refresh
+              Refresh List
             </button>
           </div>
         ) : (
@@ -95,18 +96,18 @@ export default function Step1Department() {
                 if (dept) setDepartment(dept);
               }}
             >
-              <SelectTrigger className="w-full [&>span]:line-clamp-none [&>span]:text-left [&>span]:whitespace-normal">
+              <SelectTrigger className="w-full h-14 text-lg bg-gray-50 border-gray-200 focus:ring-[#F05137]/20 focus:border-[#F05137] rounded-xl transition-all duration-200 [&>span]:line-clamp-none [&>span]:text-left [&>span]:whitespace-normal">
                 <SelectValue placeholder="Select a department" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-xl border-gray-100 shadow-xl">
                 {departments.map((dept) => {
                   if (dept._id == null) return null;
                   return (
-                    <SelectItem key={dept._id} value={dept._id} className="py-3">
-                      <div className="flex flex-col items-start gap-1">
-                        <span className="font-medium">{dept.name}</span>
+                    <SelectItem key={dept._id} value={dept._id} className="py-4 cursor-pointer focus:bg-[#FFF5F2] focus:text-[#F05137]">
+                      <div className="flex flex-col items-start gap-1.5">
+                        <span className="font-bold text-base">{dept.name}</span>
                         {dept.description && (
-                          <span className="text-xs text-gray-500 line-clamp-1">{dept.description}</span>
+                          <span className="text-xs text-gray-400 line-clamp-1 font-medium">{dept.description}</span>
                         )}
                       </div>
                     </SelectItem>
@@ -118,13 +119,13 @@ export default function Step1Department() {
         )}
       </div>
 
-      <div className="flex justify-end pt-4">
+      <div className="flex justify-end pt-6 border-t border-gray-100">
         <Button
           variant="primary"
           size="lg"
           onClick={handleNext}
           disabled={!selectedDepartment}
-          className="min-w-[140px]"
+          className="min-w-[160px] h-12 text-base font-bold shadow-lg shadow-[#F05137]/20 rounded-full"
         >
           Continue
         </Button>

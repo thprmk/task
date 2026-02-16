@@ -1,12 +1,10 @@
 import {
   Calendar,
-  Clock,
   Mail,
   Phone,
   User,
-  MapPin,
   Stethoscope,
-  Briefcase
+  Briefcase,
 } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '../../../lib/types/appointment.types';
 import { formatDateDisplay, formatTimeSlot } from '../../lib/utils/dateUtils';
@@ -31,119 +29,113 @@ export default function AppointmentCard({ appointment, onStatusUpdate, isUpdatin
     ? departmentRef.name
     : 'Unknown Department';
 
+  const canUpdate =
+    onStatusUpdate &&
+    appointment._id &&
+    (appointment.status === AppointmentStatus.PENDING || appointment.status === AppointmentStatus.CONFIRMED);
+
   return (
-    <Card className="hover:shadow-md transition-all duration-200 border-gray-200/60 flex flex-col h-full bg-white group">
-      <div className="p-1 flex-1 space-y-4">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-              <User size={20} />
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-gray-900 leading-tight">
-                {appointment.patient.name}
-              </h3>
-              <p className="text-sm text-gray-500 mt-0.5">
-                {appointment.patient.age} yrs • {appointment.patient.gender}
-              </p>
-            </div>
+    <Card className="flex flex-col h-full bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden hover:border-slate-300 transition-colors min-w-0">
+      {/* Header: patient + status */}
+      <div className="px-3 sm:px-4 pt-3 sm:pt-4 pb-2.5 sm:pb-3 flex items-center justify-between gap-2 sm:gap-3 border-b border-slate-100 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 shrink-0">
+            <User size={16} strokeWidth={2} className="text-slate-500" />
           </div>
-          <StatusBadge status={appointment.status} className="shrink-0" />
-        </div>
-
-        {/* Key Info Grid */}
-        <div className="grid grid-cols-1 gap-y-2.5 text-sm">
-          <div className="flex items-center text-gray-600 gap-2.5">
-            <Stethoscope size={16} className="text-gray-400 shrink-0" />
-            <span className="font-medium text-gray-900">{doctorName}</span>
-          </div>
-          <div className="flex items-center text-gray-600 gap-2.5">
-            <Briefcase size={16} className="text-gray-400 shrink-0" />
-            <span>{departmentName}</span>
-          </div>
-          <div className="flex items-center text-gray-600 gap-2.5">
-            <Calendar size={16} className="text-gray-400 shrink-0" />
-            <span>{formatDateDisplay(appointment.date)}</span>
-          </div>
-          <div className="flex items-center text-gray-600 gap-2.5">
-            <Clock size={16} className="text-gray-400 shrink-0" />
-            <span>{formatTimeSlot(appointment.timeSlot)}</span>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm font-semibold text-slate-900 truncate">
+              {appointment.patient.name}
+            </h3>
+            <p className="text-xs text-slate-500">
+              {appointment.patient.age} yrs · {appointment.patient.gender}
+            </p>
           </div>
         </div>
+        <StatusBadge status={appointment.status} className="shrink-0" />
+      </div>
 
-        {/* Divider */}
-        <div className="h-px bg-gray-100 my-3" />
-
-        {/* Contact Info */}
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center text-gray-600 gap-2.5">
-            <Phone size={14} className="text-gray-400 shrink-0" />
-            <span className="truncate">{appointment.patient.phone}</span>
-          </div>
-          <div className="flex items-center text-gray-600 gap-2.5">
-            <Mail size={14} className="text-gray-400 shrink-0" />
-            <span className="truncate" title={appointment.patient.email}>{appointment.patient.email}</span>
-          </div>
+      {/* Details: compact list, wrap on small screens */}
+      <div className="px-3 sm:px-4 py-2.5 sm:py-3 flex-1 space-y-2 sm:space-y-2.5 text-xs min-w-0">
+        <div className="flex items-center gap-2 text-slate-700 min-w-0">
+          <Stethoscope size={12} className="shrink-0 text-slate-400" />
+          <span className="truncate">{doctorName}</span>
         </div>
-
-        {/* Reason */}
-        <div className="bg-gray-50 rounded-lg p-3 mt-3">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Reason</p>
-          <p className="text-sm text-gray-700 line-clamp-2">{appointment.patient.reason}</p>
+        <div className="flex items-center gap-2 text-slate-700 min-w-0">
+          <Briefcase size={12} className="shrink-0 text-slate-400" />
+          <span className="truncate">{departmentName}</span>
+        </div>
+        <div className="flex items-start gap-2 text-slate-700 min-w-0">
+          <Calendar size={12} className="shrink-0 text-slate-400 mt-0.5" />
+          <span className="break-words">
+            {formatDateDisplay(appointment.date)}
+            <span className="hidden sm:inline"> · </span>
+            <span className="sm:inline block sm:inline">{formatTimeSlot(appointment.timeSlot)}</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-2 text-slate-500 min-w-0">
+          <Phone size={12} className="shrink-0 text-slate-400" />
+          <span className="truncate">{appointment.patient.phone}</span>
+        </div>
+        <div className="flex items-center gap-2 text-slate-500 min-w-0">
+          <Mail size={12} className="shrink-0 text-slate-400" />
+          <span className="truncate break-all" title={appointment.patient.email}>{appointment.patient.email}</span>
         </div>
       </div>
 
-      {/* Actions */}
-      {onStatusUpdate && appointment._id && (
-        <div className="pt-4 mt-2 border-t border-gray-100">
+      {/* Reason */}
+      <div className="px-3 sm:px-4 pb-2.5 sm:pb-3 min-w-0">
+        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-1">Reason for visit</p>
+        <p className="text-xs text-slate-700 line-clamp-2 leading-relaxed bg-slate-50 rounded-md px-2.5 py-2 border border-slate-100 break-words">
+          {appointment.patient.reason}
+        </p>
+      </div>
+
+      {/* Actions: touch-friendly on mobile (min 44px) */}
+      {canUpdate && (
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-t border-slate-100 bg-slate-50/30 space-y-2">
           <div className="flex flex-wrap gap-2">
-            {appointment.status !== AppointmentStatus.CONFIRMED && (
+            {appointment.status === AppointmentStatus.PENDING && (
               <Button
                 variant="primary"
                 size="sm"
-                className="flex-1 text-xs"
-                onClick={() => onStatusUpdate(appointment._id!, AppointmentStatus.CONFIRMED)}
+                className="rounded-md text-xs min-h-[44px] sm:min-h-8 flex-1 sm:flex-initial touch-manipulation"
+                onClick={() => onStatusUpdate!(appointment._id!, AppointmentStatus.CONFIRMED)}
                 disabled={isUpdating}
               >
                 Confirm
               </Button>
             )}
-            {appointment.status !== AppointmentStatus.COMPLETED && appointment.status === AppointmentStatus.CONFIRMED && (
+            {appointment.status === AppointmentStatus.CONFIRMED && (
               <Button
                 variant="secondary"
                 size="sm"
-                className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white border-transparent"
-                onClick={() => onStatusUpdate(appointment._id!, AppointmentStatus.COMPLETED)}
+                className="rounded-md text-xs min-h-[44px] sm:min-h-8 flex-1 sm:flex-initial touch-manipulation"
+                onClick={() => onStatusUpdate!(appointment._id!, AppointmentStatus.COMPLETED)}
                 disabled={isUpdating}
               >
                 Complete
               </Button>
             )}
-            {(appointment.status === AppointmentStatus.PENDING || appointment.status === AppointmentStatus.CONFIRMED) && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 text-xs text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
-                onClick={() => onStatusUpdate(appointment._id!, AppointmentStatus.CANCELLED)}
-                disabled={isUpdating}
-              >
-                Cancel
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-md text-xs min-h-[44px] sm:min-h-8 flex-1 sm:flex-initial text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 touch-manipulation"
+              onClick={() => onStatusUpdate!(appointment._id!, AppointmentStatus.CANCELLED)}
+              disabled={isUpdating}
+            >
+              Cancel
+            </Button>
           </div>
-          {/* Secondary Actions Row if needed, or keeping it clean */}
-          {(appointment.status === AppointmentStatus.PENDING || appointment.status === AppointmentStatus.CONFIRMED) && (
-            <div className="mt-2 flex justify-end">
-              <button
-                onClick={() => onStatusUpdate(appointment._id!, AppointmentStatus.NO_SHOW)}
-                disabled={isUpdating}
-                className="text-xs text-gray-400 hover:text-gray-600 underline decoration-gray-300 hover:decoration-gray-500"
-              >
-                Mark as No Show
-              </button>
-            </div>
-          )}
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={() => onStatusUpdate!(appointment._id!, AppointmentStatus.NO_SHOW)}
+              disabled={isUpdating}
+              className="min-h-[44px] sm:min-h-0 py-2 sm:py-0 text-[11px] text-slate-400 hover:text-slate-600 touch-manipulation"
+            >
+              Mark as No Show
+            </button>
+          </div>
         </div>
       )}
     </Card>

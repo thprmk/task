@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 interface Tab {
   id: string;
@@ -54,6 +54,9 @@ const tabsData: Tab[] = [
   },
 ];
 
+const TABLIST_ID = 'tabbed-section-tablist';
+const TABPANEL_ID = 'tabbed-section-tabpanel';
+
 /* Figma design tokens – Vector 3: border 2.34466px #F05137, radius 23.4466px, bg #FAFAFA */
 const TABBED_SECTION_CSS = {
   cardWidth: 1103.48,
@@ -68,6 +71,7 @@ const TABBED_SECTION_CSS = {
   tabFont: {
     fontFamily: "'Helonik', sans-serif",
     fontWeight: 500,
+    fontStyle: 'normal',
     fontSize: '18.7573px',
     lineHeight: '66px',
   },
@@ -75,8 +79,8 @@ const TABBED_SECTION_CSS = {
     fontFamily: "'Helonik', sans-serif",
     fontWeight: 500,
     fontStyle: 'normal',
-    fontSize: '31.26px',
-    lineHeight: '57.05px',
+    fontSize: '31.2622px',
+    lineHeight: '57px',
     letterSpacing: '0%',
     color: '#000000',
   },
@@ -102,76 +106,67 @@ export default function TabbedSection() {
 
   const isOverviewActive = activeTab === 'overview';
 
+  const handleKeyDownFirst = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      setActiveTab(tabsData[1].id);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      setActiveTab(tabsData[tabsData.length - 1].id);
+    }
+  }, []);
+
+  const handleKeyDownRest = useCallback((e: React.KeyboardEvent, tabIndex: number) => {
+    const index = tabIndex + 1;
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      setActiveTab(tabsData[index - 1].id);
+    } else if (e.key === 'ArrowRight' && index < tabsData.length - 1) {
+      e.preventDefault();
+      setActiveTab(tabsData[index + 1].id);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      setActiveTab(tabsData[0].id);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      setActiveTab(tabsData[tabsData.length - 1].id);
+    }
+  }, []);
+
   return (
-    <section className="tabbed-section py-8 sm:py-12 px-3 sm:px-6 flex justify-center">
-      {/* Card: SVG draws exact border + shape; content on top */}
-      <div
-        className="tabbed-section__card relative w-full max-w-[1103.48px] flex flex-col overflow-hidden min-h-0 lg:min-h-[463.84px]"
-      >
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          viewBox="0 0 1100 456"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-          aria-hidden
-        >
-          <path
-            d={CARD_SHAPE_PATH}
-            fill="#FFFFFF"
-            stroke="#F05137"
-            strokeWidth="2.34466"
-          />
-        </svg>
-
-        {/* Menus header: scrollable on mobile, Overview + other tabs */}
+    <section className="tabbed-section py-6 sm:py-12 px-3 sm:px-6 flex justify-center overflow-x-hidden min-w-0 w-full">
+      {/* ——— Responsive only (mobile/tablet): simple card, same border ——— */}
+      <div className="lg:hidden w-full max-w-[1103.48px] min-w-0">
         <div
-          className="tabbed-section__tabs relative flex flex-row items-stretch flex-none z-10 h-14 sm:h-[67px] flex-nowrap overflow-x-auto scrollbar-hide"
+          className="rounded-2xl border-2 border-[#F05137] bg-[#FAFAFA] overflow-hidden flex flex-col min-h-0"
+          style={{ borderWidth: 2.34466 }}
         >
-          {/* Overview tab – width matches SVG tab on desktop; fixed min on mobile */}
+          {/* Tabs: single row, scrollable, same border color */}
           <div
-            className="flex items-center justify-center flex-none shrink-0 w-[27%] min-w-[100px] sm:min-w-[140px] lg:min-w-[180px] max-w-[300px] h-full"
+            id={`${TABLIST_ID}-resp`}
+            role="tablist"
+            aria-label="Section tabs"
+            className="flex bg-white/80 overflow-x-auto scrollbar-hide shrink-0"
+            style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
           >
-            <button
-              type="button"
-              onClick={() => setActiveTab('overview')}
-              className="w-full h-full flex items-center justify-center transition-colors hover:opacity-90 touch-manipulation text-sm sm:text-base lg:text-[18.7573px]"
-              style={{
-                fontFamily: s.tabFont.fontFamily,
-                fontWeight: s.tabFont.fontWeight,
-                lineHeight: '1.2',
-                color: isOverviewActive ? s.borderColor : '#000000',
-                cursor: 'pointer',
-                border: 'none',
-                background: 'none',
-                padding: 0,
-              }}
-            >
-              {tabsData[0].label}
-            </button>
-          </div>
-
-          {/* Other tabs: horizontal scroll on mobile, gap scales */}
-          <div
-            className="flex flex-row items-center flex-1 gap-5 sm:gap-8 lg:gap-[120px] overflow-x-auto pl-4 sm:pl-6 lg:pl-8 min-w-0 shrink min-h-[3.25rem] sm:min-h-0 h-full scrollbar-hide"
-          >
-            {tabsData.slice(1).map((tab) => {
+            {tabsData.map((tab, idx) => {
               const isActive = activeTab === tab.id;
+              const isFirst = idx === 0;
               return (
                 <button
                   key={tab.id}
                   type="button"
+                  role="tab"
+                  id={`tab-${tab.id}-resp`}
+                  aria-selected={isActive}
+                  aria-controls={`${TABPANEL_ID}-resp`}
+                  tabIndex={isActive ? 0 : -1}
                   onClick={() => setActiveTab(tab.id)}
-                  className="tabbed-section__tab flex items-center justify-center flex-none h-full transition-colors hover:opacity-90 whitespace-nowrap touch-manipulation text-sm sm:text-base lg:text-[18.7573px] py-0 px-2 sm:px-3"
+                  onKeyDown={isFirst ? handleKeyDownFirst : (e) => handleKeyDownRest(e, idx - 1)}
+                  className="flex-shrink-0 min-h-[48px] px-4 py-3 text-left text-sm font-medium whitespace-nowrap transition-colors touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F05137] focus-visible:ring-inset"
                   style={{
                     fontFamily: s.tabFont.fontFamily,
-                    fontWeight: s.tabFont.fontWeight,
-                    lineHeight: '1.2',
                     color: isActive ? s.borderColor : '#000000',
-                    background: 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    textAlign: 'center',
                   }}
                 >
                   {tab.label}
@@ -179,39 +174,166 @@ export default function TabbedSection() {
               );
             })}
           </div>
-        </div>
-
-        {/* Content – responsive padding and typography */}
-        <div
-          className="tabbed-section__content relative flex-1 flex flex-col min-h-0 pb-6 pt-4 pr-4 sm:pb-10 sm:pt-6 sm:pr-6 lg:pr-12 pl-4 sm:pl-8 lg:pl-[134px] z-10"
-        >
-          <h2
-            className="mb-3 sm:mb-4 w-[233px] max-w-full text-center text-xl sm:text-2xl lg:text-[31.26px] lg:leading-[57.05px]"
-            style={{
-              fontFamily: s.titleFont.fontFamily,
-              fontWeight: s.titleFont.fontWeight,
-              fontStyle: s.titleFont.fontStyle,
-              letterSpacing: s.titleFont.letterSpacing,
-              color: s.titleFont.color,
-              textAlign: 'center',
-              lineHeight: s.titleFont.lineHeight,
-            }}
-          >
-            {currentTab.content.title}
-          </h2>
+          {/* Content */}
           <div
-            className="max-w-[1017px] text-xs sm:text-[12.5049px] leading-relaxed sm:leading-[25px]"
-            style={{
-              fontFamily: s.bodyFont.fontFamily,
-              fontWeight: s.bodyFont.fontWeight,
-              color: s.bodyFont.color,
-            }}
+            id={`${TABPANEL_ID}-resp`}
+            role="tabpanel"
+            aria-labelledby={`tab-${activeTab}-resp`}
+            className="flex-1 min-h-0 px-4 py-5 overflow-y-auto"
+            style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
           >
-            {currentTab.content.paragraphs.map((paragraph, index) => (
-              <p key={index} className="mb-3 sm:mb-4 last:mb-0">
-                {paragraph}
-              </p>
-            ))}
+            <h2
+              className="mb-3 text-left text-lg font-semibold text-black"
+              style={{ fontFamily: s.titleFont.fontFamily }}
+            >
+              {currentTab.content.title}
+            </h2>
+            <div
+              className="text-left text-sm leading-relaxed text-black break-words"
+              style={{
+                fontFamily: s.bodyFont.fontFamily,
+                lineHeight: 1.6,
+              }}
+            >
+              {currentTab.content.paragraphs.map((paragraph, index) => (
+                <p key={index} className="mb-3 last:mb-0">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ——— Desktop only: original design (do not touch) ——— */}
+      <div className="hidden lg:block w-full max-w-[1103.48px] min-w-0">
+        <div
+          className="tabbed-section__card relative w-full flex flex-col overflow-hidden min-h-[463.84px]"
+        >
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            viewBox="0 0 1100 456"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            <path
+              d={CARD_SHAPE_PATH}
+              fill="#FAFAFA"
+              stroke="#F05137"
+              strokeWidth="2.34466"
+            />
+          </svg>
+
+          <div
+            id={TABLIST_ID}
+            role="tablist"
+            aria-label="Section tabs"
+            className="tabbed-section__tabs relative flex flex-row items-stretch justify-start flex-none z-10 h-[67px] flex-nowrap"
+          >
+            <div className="flex items-center justify-center flex-none shrink-0 w-[27%] min-w-[180px] max-w-[300px] h-full relative">
+              <button
+                type="button"
+                role="tab"
+                id={`tab-${tabsData[0].id}`}
+                aria-selected={isOverviewActive}
+                aria-controls={TABPANEL_ID}
+                tabIndex={isOverviewActive ? 0 : -1}
+                onClick={() => setActiveTab('overview')}
+                onKeyDown={handleKeyDownFirst}
+                className="w-full h-full flex items-center justify-center transition-colors rounded-t focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F05137] focus-visible:ring-offset-2"
+                style={{
+                  fontFamily: s.tabFont.fontFamily,
+                  fontWeight: s.tabFont.fontWeight,
+                  fontStyle: s.tabFont.fontStyle,
+                  fontSize: s.tabFont.fontSize,
+                  lineHeight: s.tabFont.lineHeight,
+                  color: isOverviewActive ? s.borderColor : '#000000',
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: 'none',
+                  padding: 0,
+                }}
+              >
+                {tabsData[0].label}
+              </button>
+            </div>
+            <div className="flex flex-row items-center flex-1 gap-[120px] pl-8 min-w-0 shrink h-full">
+              {tabsData.slice(1).map((tab, idx) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <div key={tab.id} className="relative flex items-center justify-center flex-none h-full">
+                    <button
+                      type="button"
+                      role="tab"
+                      id={`tab-${tab.id}`}
+                      aria-selected={isActive}
+                      aria-controls={TABPANEL_ID}
+                      tabIndex={isActive ? 0 : -1}
+                      onClick={() => setActiveTab(tab.id)}
+                      onKeyDown={(e) => handleKeyDownRest(e, idx)}
+                      className="tabbed-section__tab flex items-center justify-center flex-none h-full transition-colors whitespace-nowrap py-0 px-3 rounded-t focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F05137] focus-visible:ring-offset-2"
+                      style={{
+                        fontFamily: s.tabFont.fontFamily,
+                        fontWeight: s.tabFont.fontWeight,
+                        fontStyle: s.tabFont.fontStyle,
+                        fontSize: s.tabFont.fontSize,
+                        lineHeight: s.tabFont.lineHeight,
+                        color: isActive ? s.borderColor : '#000000',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div
+            id={TABPANEL_ID}
+            role="tabpanel"
+            aria-labelledby={`tab-${activeTab}`}
+            className="tabbed-section__content relative flex-1 flex flex-col items-start justify-start min-h-0 pb-10 pt-6 pr-12 pl-8 z-10 min-w-0 text-left"
+            style={{ alignItems: 'flex-start', textAlign: 'left' }}
+          >
+            <h2
+              className="mb-4 w-[233px] max-w-full text-left self-start"
+              style={{
+                fontFamily: s.titleFont.fontFamily,
+                fontWeight: s.titleFont.fontWeight,
+                fontStyle: s.titleFont.fontStyle,
+                fontSize: s.titleFont.fontSize,
+                lineHeight: s.titleFont.lineHeight,
+                letterSpacing: s.titleFont.letterSpacing,
+                color: s.titleFont.color,
+                textAlign: 'left',
+              }}
+            >
+              {currentTab.content.title}
+            </h2>
+            <div
+              className="max-w-[1017px] w-full min-w-0 flex flex-col items-start justify-start text-left self-start"
+              style={{
+                fontFamily: s.bodyFont.fontFamily,
+                fontWeight: s.bodyFont.fontWeight,
+                fontSize: s.bodyFont.fontSize,
+                lineHeight: s.bodyFont.lineHeight,
+                color: s.bodyFont.color,
+                textAlign: 'left',
+              }}
+            >
+              {currentTab.content.paragraphs.map((paragraph, index) => (
+                <p key={index} className="mb-4 last:mb-0 text-left">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
           </div>
         </div>
       </div>

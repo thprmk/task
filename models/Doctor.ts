@@ -14,6 +14,7 @@ export interface IDoctor extends Document {
     end: string;
   };
   weeklyOff: number[];
+  imageUrl?: string;
 }
 
 const DoctorSchema = new Schema<IDoctor>(
@@ -70,6 +71,7 @@ const DoctorSchema = new Schema<IDoctor>(
         message: 'Weekly off days must be between 0 (Sunday) and 6 (Saturday)',
       },
     },
+    imageUrl: { type: String, default: null },
   },
   {
     timestamps: true,

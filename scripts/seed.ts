@@ -75,8 +75,8 @@ async function seedDatabase() {
           start: '16:00',
           end: '18:00',
         },
-        // No break in this short window
         weeklyOff: [0], // 0 = Sunday (working Mon–Sat)
+        imageUrl: '/doctors/dr-raghul.png', // doctor proof photo used on profile
       },
     ]);
     console.log('✅ Created Dr. Raghull');

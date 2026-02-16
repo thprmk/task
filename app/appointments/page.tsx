@@ -2,13 +2,11 @@ import ViewAppointmentsMinimal from '../components/appointments/ViewAppointments
 
 export default function AppointmentsPage() {
   return (
-    <div className="min-h-screen bg-gray-50/50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Appointments</h1>
-          <p className="text-gray-500">
-            Manage and view your scheduled appointments
-          </p>
+    <div className="min-h-screen bg-slate-50/80 py-4 px-3 sm:py-10 sm:px-6 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 min-w-0 w-full">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight sm:text-2xl md:text-3xl">Appointments</h1>
+          <p className="mt-0.5 text-xs text-slate-500 sm:mt-1 sm:text-sm">View and manage appointments with filters and search</p>
         </div>
         <ViewAppointmentsMinimal />
       </div>

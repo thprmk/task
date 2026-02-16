@@ -6,11 +6,15 @@ import Input from '../ui/Input';
 interface AppointmentSearchProps {
   onSearchChange: (search: string) => void;
   debounceMs?: number;
+  label?: string | null;
+  className?: string;
 }
 
 export default function AppointmentSearch({
   onSearchChange,
   debounceMs = 300,
+  label = "Search",
+  className,
 }: AppointmentSearchProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -25,11 +29,11 @@ export default function AppointmentSearch({
   return (
     <Input
       type="text"
-      label="Search"
+      label={label === null ? undefined : label}
       placeholder="Search by patient name, phone, or email..."
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
-      className="w-full"
+      className={className ?? "w-full"}
     />
   );
 }
