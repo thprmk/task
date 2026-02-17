@@ -131,7 +131,7 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
 
   return (
     <div
-      className="flex-shrink-0 flex flex-col overflow-hidden book-appointment-card w-full max-w-[390px] sm:w-[390px] h-[320px] sm:h-[356px] bg-[#EDEDED] rounded-[24px]"
+      className="flex-shrink-0 flex flex-col overflow-hidden book-appointment-card w-full max-w-[390px] min-h-[320px] sm:w-[390px] sm:h-[356px] bg-[#EDEDED] rounded-[24px]"
     >
       <div className="flex flex-col flex-1 min-h-0 px-3 sm:px-4 pt-4 sm:pt-5 pb-3 sm:pb-4">
         <h2
@@ -290,15 +290,15 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
           </motion.button>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-[9px] mt-auto items-stretch sm:items-center justify-center sm:justify-center mx-auto sm:w-[320px] sm:h-[44px]">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-[9px] mt-auto items-stretch sm:items-center justify-center">
           <motion.button
             type="button"
-            className="flex items-center justify-center min-h-[38.4px] sm:h-[44px] px-3 sm:px-3 py-2 sm:py-0 bg-white flex-1 sm:flex-none sm:w-[145px] font-medium text-xs sm:text-xs text-black text-center"
+            className="flex items-center justify-center min-h-[38.4px] sm:min-h-[38px] sm:h-[38px] px-4 sm:px-2.5 py-2.5 sm:py-1.5 bg-white flex-1 sm:flex-none sm:w-[140px] font-medium text-xs sm:text-[11px] text-black text-center"
             style={{
               fontFamily: "'Helonik', sans-serif",
               fontWeight: 500,
               border: '1.7486px solid #F05137',
-              borderRadius: '24px',
+              borderRadius: 83.7161,
               boxShadow: '0px 0px 2.45131px rgba(0, 0, 0, 0.22)',
             }}
             whileHover={{ scale: 1.02, transition: HOVER_TRANSITION }}
@@ -309,12 +309,12 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
           <motion.button
             type="button"
             onClick={handleBookAppointments}
-            className="flex items-center justify-center min-h-[38.4px] sm:h-[44px] px-3 sm:px-3 py-2 sm:py-0 bg-[#F05137] flex-1 sm:flex-none sm:w-[166px] font-medium text-xs sm:text-xs text-white text-center"
+            className="flex items-center justify-center min-h-[38.4px] sm:min-h-[38px] sm:h-[38px] px-4 sm:px-2.5 py-2.5 sm:py-1.5 bg-[#F05137] flex-1 sm:flex-none sm:w-[170px] font-medium text-xs sm:text-[11px] text-white text-center"
             style={{
               fontFamily: "'Helonik', sans-serif",
               fontWeight: 500,
               border: '1.7486px solid #FFFFFF',
-              borderRadius: '24px',
+              borderRadius: 83.7161,
               boxShadow: '0px 0px 2.45131px rgba(0, 0, 0, 0.22)',
             }}
             whileHover={{ scale: 1.02, transition: HOVER_TRANSITION }}

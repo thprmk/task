@@ -29,6 +29,7 @@ export default function HospitalCalendar() {
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
   const isInitialMount = useRef(true);
+  const hasShownGridOnce = useRef(false);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -257,10 +258,17 @@ export default function HospitalCalendar() {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={currentWeek.getTime()}
-              initial={{ opacity: 0, x: slideDirection === 'left' ? 30 : -30 }}
+              initial={
+                hasShownGridOnce.current
+                  ? { opacity: 0, x: slideDirection === 'left' ? 30 : -30 }
+                  : false
+              }
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: slideDirection === 'left' ? -30 : 30 }}
               transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+              onAnimationComplete={() => {
+                hasShownGridOnce.current = true;
+              }}
             >
           <CalendarGrid
             startDate={currentWeek}
