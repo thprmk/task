@@ -31,23 +31,23 @@ export default function DoctorProfile() {
 
       {/* Doctor image: full-width block on mobile, fixed width on desktop */}
       <div 
-        className="relative flex-shrink-0 z-10 w-full lg:w-[298.32px] h-[200px] sm:h-[240px] lg:h-[311.67px] self-start pt-0 pb-0 overflow-hidden" 
+        className="relative flex-shrink-0 z-10 w-full lg:w-[298.32px] h-[200px] sm:h-[240px] lg:h-[311.67px] pt-0 pb-0 overflow-hidden flex items-center justify-center lg:items-start lg:justify-start" 
         style={{ 
-          maxWidth: '298.32px', 
+          maxWidth: '100%',
           maxHeight: '311.67px',
           boxSizing: 'border-box'
         }}
       >
-        <div className="absolute inset-0 w-full h-full" style={{ maxWidth: '298.32px', maxHeight: '311.67px' }}>
+        <div className="relative w-full h-full max-w-full" style={{ maxWidth: '100%', maxHeight: '100%' }}>
           <Image
             src="/doctors/dr-raghul.png"
             alt="Dr. Raghul"
             fill
-            className="object-contain object-top"
+            className="object-contain object-center lg:object-top"
             priority
             sizes="(max-width: 1024px) 100vw, 298.32px"
             style={{ 
-              objectPosition: 'center top',
+              objectPosition: 'center center',
               objectFit: 'contain',
               width: '100%',
               height: '100%'
