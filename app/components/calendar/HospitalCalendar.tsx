@@ -172,7 +172,7 @@ export default function HospitalCalendar() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50/80 flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4">
         <div className="w-10 h-10 border-2 border-[#F05137] border-t-transparent rounded-full animate-spin" />
         <p className="mt-4 text-slate-600 font-medium">Loading calendar...</p>
       </div>
@@ -180,7 +180,7 @@ export default function HospitalCalendar() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/80 py-4 px-3 sm:py-10 sm:px-6">
+    <div className="min-h-screen py-4 px-3 sm:py-10 sm:px-6">
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Page header + week nav */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

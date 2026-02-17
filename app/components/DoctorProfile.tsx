@@ -39,12 +39,12 @@ export default function DoctorProfile() {
         }}
       >
         <div className="relative w-full h-full max-w-full" style={{ maxWidth: '100%', maxHeight: '100%' }}>
-          <Image
-            src="/doctors/dr-raghul.png"
-            alt="Dr. Raghul"
-            fill
+        <Image
+          src="/doctors/dr-raghul.png"
+          alt="Dr. Raghul"
+          fill
             className="object-contain object-center lg:object-top"
-            priority
+          priority
             sizes="(max-width: 1024px) 100vw, 298.32px"
             style={{ 
               objectPosition: 'center center',
@@ -52,7 +52,7 @@ export default function DoctorProfile() {
               width: '100%',
               height: '100%'
             }}
-          />
+        />
         </div>
       </div>
 
