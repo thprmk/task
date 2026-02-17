@@ -7,7 +7,12 @@ import { motion } from 'framer-motion';
 export default function DoctorProfile() {
   return (
     <motion.div
-      className="w-full max-w-[698px] min-w-0 min-h-0 bg-white shadow-sm relative overflow-hidden flex flex-col lg:flex-row flex-shrink-0 box-border rounded-2xl border-2 border-[#F05137]/20"
+      className="w-full max-w-[698px] min-w-0 min-h-0 bg-white shadow-sm relative overflow-hidden flex flex-col lg:flex-row flex-shrink-0 box-border"
+      style={{
+        borderRadius: '23.7012px',
+        border: '2.37012px solid rgba(240, 81, 55, 0.22)',
+        minHeight: '355.52px',
+      }}
       whileHover={{ boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
       transition={{ duration: 0.2 }}
     >
@@ -25,14 +30,15 @@ export default function DoctorProfile() {
       </motion.div>
 
       {/* Doctor image: full-width block on mobile, fixed width on desktop */}
-      <div className="relative flex-shrink-0 z-10 w-full lg:w-[298px] h-[200px] sm:h-[240px] lg:h-[312px] lg:min-h-[355px]">
+      <div className="relative flex-shrink-0 z-10 w-full lg:w-[298.32px] h-[200px] sm:h-[240px] lg:h-[311.67px] self-start pt-0 pb-0">
         <Image
           src="/doctors/dr-raghul.png"
           alt="Dr. Raghul"
           fill
-          className="object-contain object-[center_38%]"
+          className="object-contain object-top"
           priority
-          sizes="(max-width: 1024px) 100vw, 298px"
+          sizes="(max-width: 1024px) 100vw, 298.32px"
+          style={{ objectPosition: 'center top' }}
         />
       </div>
 
@@ -51,25 +57,43 @@ export default function DoctorProfile() {
             />
           </div>
         </div>
-        <div className="relative z-10 px-4 sm:px-6 lg:pl-10 lg:pr-4 py-5 sm:py-6 lg:py-8">
+        <div className="relative z-10 px-4 sm:px-6 lg:pl-4 lg:pr-4 py-5 sm:py-6 lg:py-8">
         <h1
-          className="text-black mb-1 text-xl sm:text-2xl lg:text-[28.7px] leading-tight lg:leading-[37px]"
-          style={{ fontFamily: "'Helonik', sans-serif", fontWeight: 500 }}
+          className="text-black mb-1 text-xl sm:text-2xl"
+          style={{ 
+            fontFamily: "'Helonik', sans-serif", 
+            fontWeight: 500,
+            fontSize: '28.7028px',
+            lineHeight: '37px'
+          }}
         >
           Dr. Raghull
         </h1>
         <p
-          className="text-black mb-3 text-sm sm:text-base leading-snug"
-          style={{ fontFamily: "'Helonik', sans-serif", fontWeight: 400 }}
+          className="text-black mb-3 text-sm sm:text-base"
+          style={{ 
+            fontFamily: "'Helonik', sans-serif", 
+            fontWeight: 400,
+            fontSize: '16px',
+            lineHeight: '23px'
+          }}
         >
           Senior Consultant – Obstetrics & Gynaecology
         </p>
 
-        <div className="w-full max-w-[359px] border-t border-gray-200 my-3 lg:mb-4" />
+        <div 
+          className="w-full max-w-[359.07px] my-3 lg:mb-4"
+          style={{ borderTop: '1.18506px solid #E2E2E2' }}
+        />
 
         <p
-          className="text-black mb-2 text-base sm:text-lg leading-snug"
-          style={{ fontFamily: "'Helonik', sans-serif", fontWeight: 500 }}
+          className="text-black mb-2"
+          style={{ 
+            fontFamily: "'Helonik', sans-serif", 
+            fontWeight: 500,
+            fontSize: '18.961px',
+            lineHeight: '15px'
+          }}
         >
           5+ Years experience
         </p>
@@ -80,24 +104,40 @@ export default function DoctorProfile() {
           MBBS, MS (O&G), F.MAS, F.ART, Diploma in Advanced Laparoscopy (Kiel, Germany), Diploma in Cosmetic Gynaecology
         </p>
 
-        <div className="flex flex-row items-center gap-2 mb-2">
+        <div className="flex flex-row items-center mb-2" style={{ gap: '9.48px' }}>
           <span className="text-[#F05137] flex-shrink-0 w-5 h-5 sm:w-6 sm:h-5" aria-hidden>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
               <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
             </svg>
           </span>
-          <span className="text-black text-xs sm:text-[15.6px] leading-tight" style={{ fontFamily: "'Helonik', sans-serif", fontWeight: 400 }}>
+          <span 
+            className="text-black" 
+            style={{ 
+              fontFamily: "'Helonik', sans-serif", 
+              fontWeight: 400,
+              fontSize: '15.6475px',
+              lineHeight: '23px'
+            }}
+          >
             English • Hindi • Tam
           </span>
         </div>
 
-        <div className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center" style={{ gap: '10.67px' }}>
           <span className="text-[#F05137] flex-shrink-0 w-5 h-5 sm:w-6 sm:h-5" aria-hidden>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
               <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" />
             </svg>
           </span>
-          <span className="text-black text-xs sm:text-[15.6px] leading-tight" style={{ fontFamily: "'Helonik', sans-serif", fontWeight: 400 }}>
+          <span 
+            className="text-black" 
+            style={{ 
+              fontFamily: "'Helonik', sans-serif", 
+              fontWeight: 400,
+              fontSize: '15.6475px',
+              lineHeight: '23px'
+            }}
+          >
             16:00 - 18:00 • Mon - Sat
           </span>
         </div>

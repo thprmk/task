@@ -89,7 +89,7 @@ export default function Header() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className="bg-white w-full min-w-0 overflow-x-hidden shadow-sm py-3 sm:py-4 px-4 sm:px-6 lg:px-[87px] relative lg:min-h-[92px]">
+    <header className="bg-white w-full min-w-0 overflow-x-hidden shadow-sm lg:shadow-none py-3 sm:py-4 px-4 sm:px-6 lg:px-[87px] relative lg:min-h-[92px]">
       <div className="max-w-[1920px] mx-auto flex items-center justify-between box-border relative">
         {/* Logo - on desktop aligned with doctor profile / main content start (centered 1120px block) */}
         <Link

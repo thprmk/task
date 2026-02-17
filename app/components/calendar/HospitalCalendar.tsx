@@ -48,7 +48,7 @@ export default function HospitalCalendar() {
       if (isTransition) {
         setIsTransitioning(true);
       } else {
-        setLoading(true);
+      setLoading(true);
       }
       const weekStart = currentWeek.toISOString().split('T')[0];
       const weekEnd = new Date(currentWeek);
@@ -57,10 +57,10 @@ export default function HospitalCalendar() {
 
       // Fetch doctors (only on initial load)
       if (!isTransition) {
-        const doctorsRes = await fetch('/api/doctors');
-        const doctorsData = await doctorsRes.json();
-        if (doctorsData.success) {
-          setDoctors(doctorsData.data);
+      const doctorsRes = await fetch('/api/doctors');
+      const doctorsData = await doctorsRes.json();
+      if (doctorsData.success) {
+        setDoctors(doctorsData.data);
         }
       }
 
@@ -78,7 +78,7 @@ export default function HospitalCalendar() {
       if (isTransition) {
         setIsTransitioning(false);
       } else {
-        setLoading(false);
+      setLoading(false);
       }
     }
   };
@@ -262,12 +262,12 @@ export default function HospitalCalendar() {
               exit={{ opacity: 0, x: slideDirection === 'left' ? -30 : 30 }}
               transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
             >
-              <CalendarGrid
-                startDate={currentWeek}
-                appointments={appointments}
-                doctors={doctors}
-                onSlotClick={handleSlotClick}
-              />
+          <CalendarGrid
+            startDate={currentWeek}
+            appointments={appointments}
+            doctors={doctors}
+            onSlotClick={handleSlotClick}
+          />
             </motion.div>
           </AnimatePresence>
         </div>
