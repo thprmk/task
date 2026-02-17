@@ -30,7 +30,7 @@ export default function DoctorProfile() {
       </motion.div>
 
       {/* Doctor image: full-width block on mobile, fixed width on desktop */}
-      <div className="relative flex-shrink-0 z-10 w-full lg:w-[298.32px] h-[200px] sm:h-[240px] lg:h-[311.67px] self-start pt-0 pb-0">
+      <div className="relative flex-shrink-0 z-10 w-full lg:w-[298.32px] h-[200px] sm:h-[240px] lg:h-[311.67px] self-start pt-0 pb-0 overflow-hidden" style={{ maxWidth: '298.32px' }}>
         <Image
           src="/doctors/dr-raghul.png"
           alt="Dr. Raghul"
@@ -38,7 +38,10 @@ export default function DoctorProfile() {
           className="object-contain object-top"
           priority
           sizes="(max-width: 1024px) 100vw, 298.32px"
-          style={{ objectPosition: 'center top' }}
+          style={{ 
+            objectPosition: 'center top',
+            objectFit: 'contain'
+          }}
         />
       </div>
 
