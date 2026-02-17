@@ -13,9 +13,8 @@ const TIME_SLOTS = [
 ];
 
 const SLIDE_TRANSITION = { type: 'tween' as const, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] as const };
-const HOVER_TRANSITION = { type: 'tween' as const, duration: 0.28, ease: [0.33, 1, 0.68, 1] as const };
-const DATE_CHIP_HOVER = { type: 'tween' as const, duration: 0.36, ease: [0.22, 1, 0.36, 1] as const };
-const TAP_TRANSITION = { type: 'tween' as const, duration: 0.12, ease: [0.4, 0, 0.2, 1] as const };
+const HOVER_TRANSITION = { type: 'tween' as const, duration: 0.22, ease: [0.4, 0, 0.2, 1] as const };
+const TAP_TRANSITION = { type: 'tween' as const, duration: 0.15, ease: [0.4, 0, 0.2, 1] as const };
 
 function useResponsiveConfig() {
   const [width, setWidth] = useState(1024);
@@ -108,7 +107,13 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
 
   const slotsVisible = config.slotCols * config.slotRows;
   const maxDateScroll = Math.max(0, dates.length - config.datesToShow);
-  const maxTimeScroll = Math.max(0, TIME_SLOTS.length - slotsVisible);
+  const timePageCount = Math.ceil(TIME_SLOTS.length / slotsVisible);
+  const maxTimeScroll = Math.max(0, timePageCount - 1);
+  const slotPadCount = (slotsVisible - (TIME_SLOTS.length % slotsVisible)) % slotsVisible;
+  const slotsForView = useMemo(
+    () => (slotPadCount === 0 ? TIME_SLOTS : [...TIME_SLOTS, ...Array(slotPadCount).fill(null)]),
+    [slotPadCount]
+  );
 
   const dateViewportWidth = config.datesToShow * config.dateChipWidth + (config.datesToShow - 1) * config.dateGap;
   const dateStep = config.dateChipWidth + config.dateGap;
@@ -146,8 +151,8 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
             onClick={() => setDateScroll((s) => Math.max(0, s - 1))}
             className="p-1.5 sm:p-1 text-black flex-shrink-0 touch-manipulation rounded"
             aria-label="Previous dates"
-            whileHover={{ scale: 1.08, transition: HOVER_TRANSITION }}
-            whileTap={{ scale: 0.96, transition: TAP_TRANSITION }}
+            whileHover={{ scale: 1.05, transition: HOVER_TRANSITION }}
+            whileTap={{ scale: 0.97, transition: TAP_TRANSITION }}
           >
             <ChevronLeft className="w-5 h-5" />
           </motion.button>
@@ -173,9 +178,9 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
                       fontFamily: "'General Sans', sans-serif",
                       border: '1.1517px solid #FFFFFF',
                       borderRadius: 5.96988,
-                      boxShadow: '0px 0px 1.81173px rgba(0, 0, 0, 0.16), inset 0px 0px 3.45511px #404040',
+                      boxShadow: '0px 0px 1.81173px rgba(0, 0, 0, 0.16)',
                     }}
-                    whileHover={{ scale: 1.03, transition: DATE_CHIP_HOVER }}
+                    whileHover={{ scale: 1.02, transition: HOVER_TRANSITION }}
                     whileTap={{ scale: 0.98, transition: TAP_TRANSITION }}
                   >
                     <span className={isSelected ? 'text-white' : 'text-[#555555]'} style={{ fontWeight: 500, fontSize: 8.8269, lineHeight: '12px' }}>
@@ -197,8 +202,8 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
             onClick={() => setDateScroll((s) => Math.min(maxDateScroll, s + 1))}
             className="p-1.5 sm:p-1 text-black flex-shrink-0 touch-manipulation rounded"
             aria-label="Next dates"
-            whileHover={{ scale: 1.08, transition: HOVER_TRANSITION }}
-            whileTap={{ scale: 0.96, transition: TAP_TRANSITION }}
+            whileHover={{ scale: 1.05, transition: HOVER_TRANSITION }}
+            whileTap={{ scale: 0.97, transition: TAP_TRANSITION }}
           >
             <ChevronRight className="w-5 h-5" />
           </motion.button>
@@ -216,8 +221,8 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
             onClick={() => setTimeScroll((s) => Math.max(0, s - 1))}
             className="p-1.5 sm:p-1 text-black flex-shrink-0 touch-manipulation rounded"
             aria-label="Previous slots"
-            whileHover={{ scale: 1.08, transition: HOVER_TRANSITION }}
-            whileTap={{ scale: 0.96, transition: TAP_TRANSITION }}
+            whileHover={{ scale: 1.05, transition: HOVER_TRANSITION }}
+            whileTap={{ scale: 0.97, transition: TAP_TRANSITION }}
           >
             <ChevronLeft className="w-5 h-5" />
           </motion.button>
@@ -225,13 +230,13 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
             <motion.div
               className="flex h-full"
               style={{
-                width: Math.ceil(TIME_SLOTS.length / slotsVisible) * timeStep,
+                width: timePageCount * timeStep,
                 height: '100%',
               }}
               animate={{ x: -timeScroll * timeStep }}
               transition={SLIDE_TRANSITION}
             >
-              {Array.from({ length: Math.ceil(TIME_SLOTS.length / slotsVisible) }).map((_, page) => (
+              {Array.from({ length: timePageCount }).map((_, page) => (
                 <div
                   key={page}
                   className="grid flex-shrink-0 gap-1.5 h-full"
@@ -241,28 +246,31 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
                     width: slotViewportWidth,
                   }}
                 >
-                  {TIME_SLOTS.slice(page * slotsVisible, page * slotsVisible + slotsVisible).map((time, idx) => {
+                  {slotsForView.slice(page * slotsVisible, page * slotsVisible + slotsVisible).map((time, idx) => {
                     const globalIdx = page * slotsVisible + idx;
-                    const isSelected = selectedTime === globalIdx;
+                    const isPlaceholder = time === null;
+                    const isSelected = !isPlaceholder && selectedTime === globalIdx;
                     return (
                       <motion.button
-                        key={`${time}-${globalIdx}`}
+                        key={isPlaceholder ? `pad-${page}-${idx}` : `${time}-${globalIdx}`}
                         type="button"
-                        onClick={() => setSelectedTime(globalIdx)}
-                        className="flex items-center justify-center box-border text-[7px] sm:text-[8.77443px] leading-tight font-medium"
+                        disabled={isPlaceholder}
+                        onClick={() => !isPlaceholder && setSelectedTime(globalIdx)}
+                        className="flex items-center justify-center box-border text-[7px] sm:text-[8.77443px] leading-tight font-medium disabled:pointer-events-none"
                         style={{
                           width: config.slotWidth,
                           height: config.slotHeight,
-                          background: isSelected ? '#F05137' : '#FFFFFF',
-                          border: isSelected ? 'none' : '0.674956px solid #BCBABA',
+                          background: isPlaceholder ? '#F5F5F5' : isSelected ? '#F05137' : '#FFFFFF',
+                          border: isPlaceholder ? '0.674956px solid #E8E8E8' : isSelected ? 'none' : '0.674956px solid #BCBABA',
                           borderRadius: 3.37478,
                           fontFamily: "'General Sans', sans-serif",
                           color: isSelected ? '#FFFFFF' : '#000000',
+                          boxShadow: 'none',
                         }}
-                        whileHover={{ scale: 1.03, transition: HOVER_TRANSITION }}
-                        whileTap={{ scale: 0.98, transition: TAP_TRANSITION }}
+                        whileHover={isPlaceholder ? undefined : { scale: 1.02, transition: HOVER_TRANSITION }}
+                        whileTap={isPlaceholder ? undefined : { scale: 0.98, transition: TAP_TRANSITION }}
                       >
-                        {time}
+                        {isPlaceholder ? '\u2014' : time}
                       </motion.button>
                     );
                   })}
@@ -275,8 +283,8 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
             onClick={() => setTimeScroll((s) => Math.min(maxTimeScroll, s + 1))}
             className="p-1.5 sm:p-1 text-black flex-shrink-0 touch-manipulation rounded"
             aria-label="Next slots"
-            whileHover={{ scale: 1.08, transition: HOVER_TRANSITION }}
-            whileTap={{ scale: 0.96, transition: TAP_TRANSITION }}
+            whileHover={{ scale: 1.05, transition: HOVER_TRANSITION }}
+            whileTap={{ scale: 0.97, transition: TAP_TRANSITION }}
           >
             <ChevronRight className="w-5 h-5" />
           </motion.button>
@@ -307,7 +315,7 @@ export default function BookAppointmentCard({ onBookAppointmentClick }: BookAppo
               fontWeight: 500,
               border: '1.7486px solid #FFFFFF',
               borderRadius: 83.7161,
-              boxShadow: '0px 0px 2.45131px rgba(0, 0, 0, 0.22), inset 0px 0px 14.7078px #F05137',
+              boxShadow: '0px 0px 2.45131px rgba(0, 0, 0, 0.22)',
             }}
             whileHover={{ scale: 1.02, transition: HOVER_TRANSITION }}
             whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
