@@ -30,19 +30,30 @@ export default function DoctorProfile() {
       </motion.div>
 
       {/* Doctor image: full-width block on mobile, fixed width on desktop */}
-      <div className="relative flex-shrink-0 z-10 w-full lg:w-[298.32px] h-[200px] sm:h-[240px] lg:h-[311.67px] self-start pt-0 pb-0 overflow-hidden" style={{ maxWidth: '298.32px' }}>
-        <Image
-          src="/doctors/dr-raghul.png"
-          alt="Dr. Raghul"
-          fill
-          className="object-contain object-top"
-          priority
-          sizes="(max-width: 1024px) 100vw, 298.32px"
-          style={{ 
-            objectPosition: 'center top',
-            objectFit: 'contain'
-          }}
-        />
+      <div 
+        className="relative flex-shrink-0 z-10 w-full lg:w-[298.32px] h-[200px] sm:h-[240px] lg:h-[311.67px] self-start pt-0 pb-0 overflow-hidden" 
+        style={{ 
+          maxWidth: '298.32px', 
+          maxHeight: '311.67px',
+          boxSizing: 'border-box'
+        }}
+      >
+        <div className="absolute inset-0 w-full h-full" style={{ maxWidth: '298.32px', maxHeight: '311.67px' }}>
+          <Image
+            src="/doctors/dr-raghul.png"
+            alt="Dr. Raghul"
+            fill
+            className="object-contain object-top"
+            priority
+            sizes="(max-width: 1024px) 100vw, 298.32px"
+            style={{ 
+              objectPosition: 'center top',
+              objectFit: 'contain',
+              width: '100%',
+              height: '100%'
+            }}
+          />
+        </div>
       </div>
 
       {/* Text content - watermark behind this block (right side on desktop) */}
