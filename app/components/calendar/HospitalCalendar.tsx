@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { addWeeks, subWeeks, startOfWeek } from 'date-fns';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Appointment, AppointmentStatus } from '../../../lib/types/appointment.types';
 import { Doctor } from '../../../lib/types/doctor.types';
 import CalendarGrid from './CalendarGrid';
@@ -22,27 +23,45 @@ export default function HospitalCalendar() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    fetchData();
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      fetchData(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isInitialMount.current) {
+      fetchData(true);
+    }
   }, [currentWeek]);
 
-  const fetchData = async () => {
+  const fetchData = async (isTransition: boolean = false) => {
     try {
-      setLoading(true);
+      if (isTransition) {
+        setIsTransitioning(true);
+      } else {
+        setLoading(true);
+      }
       const weekStart = currentWeek.toISOString().split('T')[0];
       const weekEnd = new Date(currentWeek);
       weekEnd.setDate(weekEnd.getDate() + 6);
       const weekEndStr = weekEnd.toISOString().split('T')[0];
 
-      // Fetch doctors
-      const doctorsRes = await fetch('/api/doctors');
-      const doctorsData = await doctorsRes.json();
-      if (doctorsData.success) {
-        setDoctors(doctorsData.data);
+      // Fetch doctors (only on initial load)
+      if (!isTransition) {
+        const doctorsRes = await fetch('/api/doctors');
+        const doctorsData = await doctorsRes.json();
+        if (doctorsData.success) {
+          setDoctors(doctorsData.data);
+        }
       }
 
       // Fetch appointments for the week
@@ -56,7 +75,11 @@ export default function HospitalCalendar() {
     } catch (error) {
       console.error('Error fetching calendar data:', error);
     } finally {
-      setLoading(false);
+      if (isTransition) {
+        setIsTransitioning(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
@@ -126,15 +149,21 @@ export default function HospitalCalendar() {
   };
 
   const handlePreviousWeek = () => {
+    setSlideDirection('right');
     setCurrentWeek(subWeeks(currentWeek, 1));
   };
 
   const handleNextWeek = () => {
+    setSlideDirection('left');
     setCurrentWeek(addWeeks(currentWeek, 1));
   };
 
   const handleToday = () => {
-    setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 0 }));
+    const todayWeek = startOfWeek(new Date(), { weekStartsOn: 0 });
+    const todayWeekTime = todayWeek.getTime();
+    const currentWeekTime = currentWeek.getTime();
+    setSlideDirection(todayWeekTime < currentWeekTime ? 'right' : 'left');
+    setCurrentWeek(todayWeek);
   };
 
   const weekEnd = new Date(currentWeek);
@@ -213,12 +242,34 @@ export default function HospitalCalendar() {
           <span className="absolute top-11 right-2 z-20 hidden text-[10px] text-slate-400 sm:hidden pointer-events-none">
             Scroll →
           </span>
-          <CalendarGrid
-            startDate={currentWeek}
-            appointments={appointments}
-            doctors={doctors}
-            onSlotClick={handleSlotClick}
-          />
+          {/* Subtle loading overlay during transitions */}
+          {isTransitioning && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-30 flex items-center justify-center pointer-events-none"
+            >
+              <div className="w-8 h-8 border-2 border-[#F05137] border-t-transparent rounded-full animate-spin" />
+            </motion.div>
+          )}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={currentWeek.getTime()}
+              initial={{ opacity: 0, x: slideDirection === 'left' ? 30 : -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: slideDirection === 'left' ? -30 : 30 }}
+              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <CalendarGrid
+                startDate={currentWeek}
+                appointments={appointments}
+                doctors={doctors}
+                onSlotClick={handleSlotClick}
+              />
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Appointment Details Modal */}
