@@ -13,7 +13,7 @@ export default function Home() {
         >
           {/* 1. Breadcrumb - Figma Group 1000001853 / Rectangle 75 */}
           <nav
-            className="flex flex-row flex-wrap items-center gap-1 sm:gap-1.5 mb-4 sm:mb-6 box-border w-full max-w-full min-h-[40px] sm:min-h-[46px] py-2 sm:py-0 px-3 sm:px-6 rounded-full bg-white/80 border border-gray-100"
+            className="flex flex-row flex-wrap items-center gap-1 sm:gap-1.5 mb-4 sm:mb-6 box-border w-full max-w-full min-h-[40px] sm:min-h-[46px] py-2 sm:py-0 px-3 sm:px-6"
             aria-label="Breadcrumb"
           >
             <Link
