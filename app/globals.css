@@ -103,6 +103,21 @@ body[data-scroll-locked] {
   font-family: 'Helonik', sans-serif !important;
 }
 
+/* Desktop header nav: same text color for all items (active and visited) */
+nav[aria-label="Main navigation"] a {
+  color: #333333;
+}
+nav[aria-label="Main navigation"] a:visited,
+nav[aria-label="Main navigation"] a:hover {
+  color: #333333;
+}
+/* Selected or hovered item: white text (pill behind it) */
+nav[aria-label="Main navigation"] a.nav-pill-active,
+nav[aria-label="Main navigation"] a.nav-pill-active:visited,
+nav[aria-label="Main navigation"] a.nav-pill-active:hover {
+  color: #ffffff !important;
+}
+
 /* Hide scrollbar but keep horizontal scroll/slider behavior */
 .scrollbar-hide {
   scrollbar-width: none;

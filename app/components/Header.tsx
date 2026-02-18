@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Phone, Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { flushSync } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_LINKS = [
@@ -19,21 +20,65 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [pillStyle, setPillStyle] = useState({ left: 0, width: 0 });
+  const [pillNoTransition, setPillNoTransition] = useState(true);
   const navContainerRef = useRef<HTMLDivElement>(null);
   const navLinkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const prevPathnameRef = useRef<string | null>(null);
+  const pillRafIdRef = useRef<number | null>(null);
 
-  const activeIndex = NAV_LINKS.findIndex((l) => l.href === pathname);
-  const displayIndex = hoveredIndex !== null ? hoveredIndex : (activeIndex >= 0 ? activeIndex : 0);
+  const activeIndex = NAV_LINKS.findIndex((l) => {
+    if (l.href === '/') return pathname === '/';
+    return pathname.startsWith(l.href);
+  });
 
-  // Position sliding pill on hover/active change
+  const [clickedIndex, setClickedIndex] = useState<number | null>(null);
+
+  const displayIndex = hoveredIndex !== null
+    ? hoveredIndex
+    : (clickedIndex !== null
+      ? clickedIndex
+      : (activeIndex >= 0 ? activeIndex : -1));
+
+  // Position pill. On route change: jump instantly (no slide). On hover: slide smoothly.
   useLayoutEffect(() => {
     const container = navContainerRef.current;
     const link = navLinkRefs.current[displayIndex];
-    if (!container || !link) return;
+    if (!container || !link) {
+      if (displayIndex === -1) {
+        prevPathnameRef.current = pathname;
+      }
+      return;
+    }
     const cr = container.getBoundingClientRect();
     const lr = link.getBoundingClientRect();
-    setPillStyle({ left: lr.left - cr.left, width: lr.width });
-  }, [displayIndex]);
+    const newStyle = { left: lr.left - cr.left, width: lr.width };
+    const pathnameJustChanged = prevPathnameRef.current !== pathname;
+
+    if (pathnameJustChanged || pillNoTransition) {
+      prevPathnameRef.current = pathname;
+      if (pillRafIdRef.current !== null) {
+        cancelAnimationFrame(pillRafIdRef.current);
+        pillRafIdRef.current = null;
+      }
+      queueMicrotask(() => {
+        flushSync(() => {
+          setPillStyle(newStyle);
+          setPillNoTransition(true);
+        });
+        pillRafIdRef.current = requestAnimationFrame(() => {
+          setPillNoTransition(false);
+          pillRafIdRef.current = null;
+        });
+      });
+      return () => {
+        if (pillRafIdRef.current !== null) {
+          cancelAnimationFrame(pillRafIdRef.current);
+          pillRafIdRef.current = null;
+        }
+      };
+    }
+    setPillStyle(newStyle);
+  }, [displayIndex, pathname]);
 
   useEffect(() => {
     const onResize = () => {
@@ -81,9 +126,11 @@ export default function Header() {
     };
   }, [menuOpen]);
 
-  // Close menu on route change (e.g. after clicking a link)
+  // On route change: close menu and reset hover/click states
   useEffect(() => {
     setMenuOpen(false);
+    setHoveredIndex(null);
+    setClickedIndex(null);
   }, [pathname]);
 
   const closeMenu = () => setMenuOpen(false);
@@ -125,7 +172,7 @@ export default function Header() {
             className="relative w-full h-full flex items-center justify-center bg-white border border-[#F05137] rounded-[23px] overflow-hidden"
             style={{ boxSizing: 'border-box' }}
           >
-            {/* Sliding pill background - hover/active highlight */}
+            {/* Sliding pill: instant jump on route change, smooth slide on hover */}
             <div
               className="absolute rounded-[23px] bg-[#F05137] z-0 pointer-events-none"
               style={{
@@ -133,7 +180,8 @@ export default function Header() {
                 width: pillStyle.width,
                 top: 2,
                 bottom: 2,
-                transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                opacity: displayIndex === -1 ? 0 : 1,
+                transition: pillNoTransition ? 'none' : 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease',
               }}
             />
             {NAV_LINKS.map((link, index) => {
@@ -145,10 +193,11 @@ export default function Header() {
                   href={link.href}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
-                  className="relative z-10 flex-1 flex items-center justify-center h-full text-sm font-medium text-[#333333] rounded-[23px] select-none transition-colors duration-300 hover:no-underline active:scale-[0.98]"
+                  onClick={() => setClickedIndex(index)}
+                  className={`relative z-10 flex-1 flex items-center justify-center h-full text-sm font-medium rounded-[23px] select-none transition-colors duration-300 hover:no-underline active:scale-[0.98] no-underline ${isHighlighted ? 'nav-pill-active' : ''}`}
                   style={{
                     fontFamily: "'Helonik', sans-serif",
-                    ...(isHighlighted ? { color: 'white' } : {}),
+                    ...(isHighlighted ? { color: '#ffffff' } : {}),
                   }}
                 >
                   {link.label}
