@@ -141,7 +141,7 @@ export default function Header() {
         {/* Logo - on desktop aligned with doctor profile / main content start (centered 1120px block) */}
         <Link
           href="/"
-          className="flex-shrink-0 relative z-20 transition-transform duration-300 hover:scale-105 active:scale-95 w-auto h-10 sm:h-12 lg:absolute lg:top-[14px] lg:w-[149px] lg:h-[62px] lg:left-[max(0px,calc((100vw-1294px)/2))]"
+          className="flex-shrink-0 relative z-20 w-auto h-10 sm:h-12 lg:absolute lg:top-[14px] lg:w-[149px] lg:h-[62px] lg:left-[max(0px,calc((100vw-1294px)/2))]"
           onClick={closeMenu}
         >
           <Image
