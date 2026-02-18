@@ -31,7 +31,3 @@ export default function AppointmentSorter({ sortBy, onSortChange, label = "Sort 
     />
   );
 }
-
-
-
-

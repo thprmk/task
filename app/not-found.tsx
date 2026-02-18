@@ -9,19 +9,19 @@ export default function NotFound() {
             </div>
 
             <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-2 font-helonik">404</h1>
-            <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">Page Not Found</h2>
-
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">This page could not be found.</h2>
+        {/* 
             <p className="text-gray-500 max-w-xs sm:max-w-md mb-6 sm:mb-8 text-sm sm:text-base">
                 This page could not be found.
-            </p>
+            </p> */}
 
-            <Link
+            {/* <Link
                 href="/"
                 className="inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-[#F05137] text-white rounded-full font-medium text-sm sm:text-base hover:bg-[#d94830] transition-colors shadow-sm hover:shadow-md active:scale-[0.98]"
             >
                 <ChevronLeft size={18} />
                 Return Home
-            </Link>
+            </Link> */}
         </div>
     );
 }

@@ -46,13 +46,13 @@ async function seedDatabase() {
     await mongoose.connect(MONGODB_URI, {
       serverSelectionTimeoutMS: 15000,
     });
-    console.log('✅ Connected to MongoDB');
+    console.log('Connected to MongoDB');
 
     // 1. CLEAR existing data (so we only have Dr. Raghull)
     console.log('\nClearing old data...');
     await Department.deleteMany({});
     await Doctor.deleteMany({});
-    console.log('✅ Existing data cleared');
+    console.log('Existing data cleared');
 
     // 2. Create the Department from the image
     console.log('\nCreating department...');
@@ -61,7 +61,7 @@ async function seedDatabase() {
       description: "Women's reproductive health and childbirth",
       isActive: true,
     });
-    console.log('✅ Created department: Obstetrics & Gynaecology');
+    console.log('Created department: Obstetrics & Gynaecology');
 
     // 3. Create Dr. Raghull with exact details: "16:00 - 18:00 • Mon - Sat"
     console.log('\nCreating Dr. Raghull...');
@@ -79,39 +79,39 @@ async function seedDatabase() {
         imageUrl: '/doctors/dr-raghul.png', // doctor proof photo used on profile
       },
     ]);
-    console.log('✅ Created Dr. Raghull');
+    console.log('  Created Dr. Raghull');
 
     console.log('\n' + '='.repeat(50));
-    console.log('✅ Database seeded: Dr. Raghull added successfully!');
+    console.log('  Database seeded: Dr. Raghull added successfully!');
     console.log('='.repeat(50));
     console.log('\nSummary:');
-    console.log('  📁 Department: Obstetrics & Gynaecology');
-    console.log('  👨‍⚕️  Doctor: Dr. Raghull');
+    console.log('    Department: Obstetrics & Gynaecology');
+    console.log('    Doctor: Dr. Raghull');
     console.log('    Specialization: Senior Consultant – Obstetrics & Gynaecology');
     console.log('    Working: 16:00 - 18:00 (Mon–Sat, Sunday off)');
     console.log('    Slot duration: 30 minutes');
 
-    console.log('\n🚀 You can now use the booking system!');
+    console.log('\n You can now use the booking system!');
     console.log('   Patients can book appointments through: /booking');
     console.log('   Admins can view calendar at: /calendar');
     console.log('   Admins can manage appointments at: /appointments');
 
     // Close connection
     await mongoose.connection.close();
-    console.log('\n✅ Database connection closed');
+    console.log('\n Database connection closed');
     process.exit(0);
   } catch (error: any) {
-    console.error('\n❌ Error seeding database');
+    console.error('\n Error seeding database');
     console.error('   Message:', error?.message || error);
     
     if (error.name === 'MongooseServerSelectionError' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-      console.error('\n🔴 MongoDB Connection Error');
-      console.error('\n📝 If using MongoDB Atlas:');
+      console.error('\n MongoDB Connection Error');
+      console.error('\n If using MongoDB Atlas:');
       console.error('   1. Go to https://cloud.mongodb.com → your project → Network Access');
       console.error('   2. Click "Add IP Address" and add your current IP (or 0.0.0.0/0 to allow all)');
       console.error('   3. If the cluster is paused, click "Resume"');
       console.error('   4. Check Database Access: user must have read/write on the database');
-      console.error('\n📝 If using local MongoDB: start it with: mongod');
+      console.error('\n If using local MongoDB: start it with: mongod');
     }
     
     if (mongoose.connection.readyState === 1) {

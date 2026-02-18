@@ -153,9 +153,3 @@ export default function Step5PatientDetails() {
     </div>
   );
 }
-
-
-
-
-
-

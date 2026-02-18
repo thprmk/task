@@ -390,9 +390,3 @@ export default function DoctorCalendar({ doctorId }: DoctorCalendarProps) {
     </div>
   );
 }
-
-
-
-
-
-

@@ -95,9 +95,3 @@ export default function SlotCell({
     </button>
   );
 }
-
-
-
-
-
-

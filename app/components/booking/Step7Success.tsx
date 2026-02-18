@@ -88,9 +88,3 @@ export default function Step7Success() {
     </div>
   );
 }
-
-
-
-
-
-

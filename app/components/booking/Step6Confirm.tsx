@@ -164,9 +164,3 @@ export default function Step6Confirm() {
     </div>
   );
 }
-
-
-
-
-
-

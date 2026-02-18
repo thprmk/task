@@ -384,9 +384,3 @@ export default function HospitalCalendar() {
     </div>
   );
 }
-
-
-
-
-
-

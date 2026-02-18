@@ -10,4 +10,3 @@ export default async function DoctorCalendarPage({ params }: PageProps) {
   const { doctorId } = await params;
   return <DoctorCalendar doctorId={doctorId} />;
 }
-

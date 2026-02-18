@@ -158,9 +158,3 @@ export default function Step4TimeSlot() {
     </div>
   );
 }
-
-
-
-
-
-

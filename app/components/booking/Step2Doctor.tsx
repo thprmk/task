@@ -119,9 +119,3 @@ export default function Step2Doctor() {
     </div>
   );
 }
-
-
-
-
-
-
