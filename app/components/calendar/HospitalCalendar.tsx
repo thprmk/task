@@ -9,7 +9,7 @@ import { Doctor } from '../../../lib/types/doctor.types';
 import CalendarGrid from './CalendarGrid';
 import { Button, Modal } from '../ui';
 import StatusBadge from '../ui/StatusBadge';
-import { formatDateDisplay, formatTimeSlot } from '../../lib/utils/dateUtils';
+import { formatDateDisplay, formatTimeSlot, formatDateForInput } from '../../lib/utils/dateUtils';
 
 interface AppointmentDetails {
   appointment: Appointment;
@@ -51,10 +51,15 @@ export default function HospitalCalendar() {
       } else {
       setLoading(true);
       }
-      const weekStart = currentWeek.toISOString().split('T')[0];
-      const weekEnd = new Date(currentWeek);
-      weekEnd.setDate(weekEnd.getDate() + 6);
-      const weekEndStr = weekEnd.toISOString().split('T')[0];
+      // Format dates as YYYY-MM-DD in local timezone to match database queries
+      const weekStartDate = new Date(currentWeek);
+      weekStartDate.setHours(0, 0, 0, 0);
+      const weekStart = formatDateForInput(weekStartDate);
+      
+      const weekEndDate = new Date(currentWeek);
+      weekEndDate.setDate(weekEndDate.getDate() + 6);
+      weekEndDate.setHours(23, 59, 59, 999);
+      const weekEndStr = formatDateForInput(weekEndDate);
 
       // Fetch doctors (only on initial load)
       if (!isTransition) {

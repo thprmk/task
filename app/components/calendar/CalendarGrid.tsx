@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { startOfWeek, addDays, format, isSameDay } from 'date-fns';
+import { startOfWeek, addDays, format, isSameDay, startOfDay } from 'date-fns';
 import { Appointment, AppointmentStatus } from '../../../lib/types/appointment.types';
 import SlotCell from './SlotCell';
 import { generateSlots } from '../../lib/utils/slotManager';
@@ -12,8 +12,10 @@ import { formatDateForInput } from '../../lib/utils/dateUtils';
 /** Normalize doctorId from API (may be populated object or string) */
 function getDoctorId(apt: Appointment): string {
   const d = (apt as any).doctorId;
-  if (typeof d === 'object' && d !== null && d._id) return d._id;
-  return (apt.doctorId as string);
+  if (typeof d === 'object' && d !== null && d._id) {
+    return String(d._id); // Convert ObjectId to string
+  }
+  return String(apt.doctorId); // Ensure it's always a string
 }
 
 interface CalendarGridProps {
@@ -43,14 +45,34 @@ export default function CalendarGrid({
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   const getAppointmentForSlot = (doctorId: string, date: Date, slot: string): Appointment | undefined => {
+    // Format calendar date as local calendar day (YYYY-MM-DD)
+    // The calendar displays dates in the user's local timezone
     const dateStr = formatDateForInput(date);
+    
     return appointments.find((apt) => {
       const aptDoctorId = getDoctorId(apt);
-      const aptDateStr =
-        typeof apt.date === 'string'
-          ? apt.date.slice(0, 10)
-          : formatDateForInput(new Date(apt.date));
-      return aptDoctorId === doctorId && aptDateStr === dateStr && apt.timeSlot === slot;
+      
+      // Normalize appointment date to local calendar day (YYYY-MM-DD)
+      // Appointments are stored in UTC, but we need to compare them as local calendar days
+      let aptDateStr: string;
+      if (typeof apt.date === 'string') {
+        // If it's a string (ISO format from API), parse it and convert to local calendar day
+        const aptDateUTC = new Date(apt.date);
+        // Convert UTC date to local calendar day
+        aptDateStr = formatDateForInput(aptDateUTC);
+      } else {
+        // If it's a Date object, format as local calendar day
+        aptDateStr = formatDateForInput(new Date(apt.date));
+      }
+      
+      // Compare doctor ID, date string, and time slot
+      // Ensure all IDs are strings for comparison
+      const doctorIdMatch = String(aptDoctorId) === String(doctorId);
+      const dateMatch = aptDateStr === dateStr;
+      const slotMatch = apt.timeSlot === slot;
+      const matches = doctorIdMatch && dateMatch && slotMatch;
+      
+      return matches;
     });
   };
 
@@ -103,7 +125,8 @@ export default function CalendarGrid({
 
         {/* Doctor Rows */}
         {doctors.map((doctor, index) => {
-          const doctorId = doctor._id ?? `doc-${index}`;
+          // Normalize doctor ID to string for comparison
+          const doctorId = doctor._id ? String(doctor._id) : `doc-${index}`;
           return (
             <div key={doctorId} className="border-b border-slate-100 last:border-b-0">
               <div className="grid grid-cols-8">

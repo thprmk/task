@@ -14,6 +14,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import Department from '../models/Department';
 import Doctor from '../models/Doctor';
+import Appointment from '../models/Appointment';
 
 // Load .env.local so MONGODB_URI is available when you run: npm run seed ( .env.local wins over system env )
 try {
@@ -50,9 +51,11 @@ async function seedDatabase() {
 
     // 1. CLEAR existing data (so we only have Dr. Raghull)
     console.log('\nClearing old data...');
+    // Delete appointments first (they reference doctors/departments)
+    await Appointment.deleteMany({});
     await Department.deleteMany({});
     await Doctor.deleteMany({});
-    console.log('Existing data cleared');
+    console.log('Existing data cleared (appointments, departments, and doctors)');
 
     // 2. Create the Department from the image
     console.log('\nCreating department...');
